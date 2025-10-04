@@ -1,0 +1,8 @@
+name: Files
+description: Files to add to the image
+
+modules:
+  - type: files
+    files:
+      - source: home
+        destination: /var/home # copies files/home/* (* means everything inside it) into your image's /var/home folder
