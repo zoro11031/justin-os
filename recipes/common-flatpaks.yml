@@ -11,6 +11,7 @@ modules:
         - net.cozic.joplin_desktop
         - net.ankiweb.Anki
         - com.nextcloud.desktopclient.nextcloud
+        - org.kde.kate
         
         # Browsers
         - com.brave.Browser
