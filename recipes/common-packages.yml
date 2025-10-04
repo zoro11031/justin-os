@@ -24,7 +24,8 @@ modules:
       - ShellCheck
       - docker
       - docker-compose
-      - python3-libguestfs
+      - python3
+      - libguestfs
       - shfmt 
 
       # GUI
@@ -45,4 +46,18 @@ modules:
       - virt-top
       - virt-viewer
       - edk2-ovmf
+
+# System utilities  
+      - lm_sensors          # Hardware monitoring
+      - htop               # Process viewer (or stick with btop)
+      - rsync              # File synchronization
+      - tree               # Directory tree viewer
+      - unzip              # Archive extraction
+      - curl               # HTTP client
+      - wget               # File downloader
+
+# Development
+      - jq                 # JSON processor
+      - ansible            # Configuration management
+      - terraform          # Infrastructure as code
 
