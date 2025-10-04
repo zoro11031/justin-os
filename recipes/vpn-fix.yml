@@ -1,0 +1,16 @@
+name: VPN SELinux Fix
+description: Fix OpenVPN certificate contexts
+
+modules:
+  - type: files
+    files:
+      - source: scripts/fix-vpn-selinux.sh
+        destination: /usr/local/bin/fix-vpn-selinux.sh
+
+      - source: systemd/fix-vpn-selinux.service
+        destination: /usr/lib/systemd/system/fix-vpn-selinux.service
+
+  - type: systemd
+    system:
+      enabled:
+        - fix-vpn-selinux.service

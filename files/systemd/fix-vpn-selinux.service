@@ -1,0 +1,11 @@
+[Unit]
+Description=Fix VPN certificate SELinux contexts
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/fix-vpn-selinux.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
