@@ -4,11 +4,11 @@ description: Fix OpenVPN certificate contexts
 modules:
   - type: files
     files:
-      - src: scripts/fix-vpn-selinux.sh
-        dst: /usr/local/bin/fix-vpn-selinux.sh
-      
-      - src: systemd/fix-vpn-selinux.service
-        dst: /usr/lib/systemd/system/fix-vpn-selinux.service
+      - source: scripts/fix-vpn-selinux.sh
+        destination: /usr/local/bin/fix-vpn-selinux.sh
+
+      - source: systemd/fix-vpn-selinux.service
+        destination: /usr/lib/systemd/system/fix-vpn-selinux.service
 
   - type: systemd
     system:
