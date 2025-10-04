@@ -1,6 +1,3 @@
-name: Common Packages
-description: All the packages
-
 modules:
   - type: rpm-ostree
     install:

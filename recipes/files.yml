@@ -1,6 +1,3 @@
-name: Files
-description: Files to add to the image
-
 modules:
   - type: files
     files:

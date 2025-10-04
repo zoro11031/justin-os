@@ -1,6 +1,3 @@
-name: Common Flatpaks
-description: My Flatpak applications
-
 modules:
   - type: default-flatpaks
     notify: true

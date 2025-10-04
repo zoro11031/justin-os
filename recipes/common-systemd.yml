@@ -1,6 +1,3 @@
-name: Common Services
-description: Services to enable
-
 modules:
   - type: systemd
     system:
