@@ -1,6 +1,3 @@
-name: VPN SELinux Fix
-description: Fix OpenVPN certificate contexts
-
 modules:
   - type: files
     files:
