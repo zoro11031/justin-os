@@ -1,0 +1,58 @@
+modules:
+  - type: default-flatpaks
+    configurations:
+      - notify: true
+        scope: system
+        install:
+          # Browsers (touch-friendly)
+          - com.brave.Browser
+          - com.google.Chrome
+
+          # GNOME Core Apps
+          - org.gnome.Calculator
+          - org.gnome.Calendar
+          - org.gnome.Cheese
+          - org.gnome.Contacts
+          - org.gnome.Evince
+          - org.gnome.Loupe
+          - org.gnome.Maps
+          - org.gnome.TextEditor
+          - org.gnome.Weather
+          - org.gnome.clocks
+          - org.gnome.Snapshot
+
+          # Productivity
+          - com.bitwarden.desktop
+          - net.cozic.joplin_desktop
+          - net.ankiweb.Anki
+          - com.nextcloud.desktopclient.nextcloud
+
+          # Communication
+          - com.discordapp.Discord
+          - us.zoom.Zoom
+
+          # Media (touch-friendly players)
+          - io.bassi.Amberol
+          - org.videolan.VLC
+          - com.github.rafostar.Clapper
+          - io.github.celluloid_player.Celluloid
+          - com.github.iwalton3.jellyfin-media-player
+          - com.plexamp.Plexamp
+          - tv.plex.PlexDesktop
+
+          # Drawing/Notes (stylus support)
+          - com.github.xournalpp.xournalpp
+          - org.gnome.Rnote
+          - org.kde.krita
+          - com.birdmap.Borb
+
+          # Office
+          - org.libreoffice.LibreOffice
+
+          # PDF/Reading
+          - com.github.johnfactotum.Foliate
+
+          # Utilities
+          - com.github.tchx84.Flatseal
+          - io.github.flattool.Warehouse
+          - it.mijorus.gearlever

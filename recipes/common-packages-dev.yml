@@ -1,0 +1,31 @@
+modules:
+  - type: rpm-ostree
+    install:
+      # Virtualization
+      - guestfs-tools
+      - libvirt
+      - libvirt-daemon-config-network
+      - libvirt-daemon-kvm
+      - nmap-ncat
+      - qemu-kvm
+      - remmina
+      - spice-gtk
+      - swtpm
+      - virt-install
+      - virt-manager
+      - virt-top
+      - virt-viewer
+      - edk2-ovmf
+      # Development
+      - git
+      - go
+      - gopls
+      - nodejs-bash-language-server
+      - npm
+      - pip
+      - ShellCheck
+      - docker
+      - docker-compose
+      - python3
+      - libguestfs
+      - shfmt
