@@ -12,7 +12,6 @@ modules:
   # Import all your existing modules
   - from-file: common-repos.yml
   - from-file: common-packages.yml
-  - from-file: common-packages-dev.yml
   - from-file: common-systemd.yml
   - from-file: surface-flatpaks.yml
   - from-file: vpn-fix.yml
