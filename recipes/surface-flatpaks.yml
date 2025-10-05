@@ -42,9 +42,7 @@ modules:
 
           # Drawing/Notes (stylus support)
           - com.github.xournalpp.xournalpp
-          - org.gnome.Rnote
           - org.kde.krita
-          - com.birdmap.Borb
 
           # Office
           - org.libreoffice.LibreOffice
