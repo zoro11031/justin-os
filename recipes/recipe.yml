@@ -43,6 +43,7 @@ modules:
         # Import all the modular pieces
   - from-file: common-repos.yml
   - from-file: common-packages.yml
+  - from-file: common-packages-dev.yml
   - from-file: common-systemd.yml
   - from-file: vpn-fix.yml
   - from-file: files.yml
