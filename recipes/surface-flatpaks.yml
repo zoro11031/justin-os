@@ -29,13 +29,8 @@ modules:
 
           # Communication
           - com.discordapp.Discord
-          - us.zoom.Zoom
 
           # Media (touch-friendly players)
-          - io.bassi.Amberol
-          - org.videolan.VLC
-          - com.github.rafostar.Clapper
-          - io.github.celluloid_player.Celluloid
           - com.github.iwalton3.jellyfin-media-player
           - com.plexamp.Plexamp
           - tv.plex.PlexDesktop
@@ -47,10 +42,5 @@ modules:
           # Office
           - org.libreoffice.LibreOffice
 
-          # PDF/Reading
-          - com.github.johnfactotum.Foliate
-
           # Utilities
           - com.github.tchx84.Flatseal
-          - io.github.flattool.Warehouse
-          - it.mijorus.gearlever
