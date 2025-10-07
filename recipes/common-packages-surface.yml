@@ -1,0 +1,18 @@
+modules:
+  - type: rpm-ostree
+    install:
+      # Shell & Terminal
+      - fastfetch
+      - zsh
+
+      # GUI
+      - gnome-disk-utility
+
+      # System utilities
+      - lm_sensors # Hardware monitoring
+      - htop # Process viewer (or stick with btop)
+      - rsync # File synchronization
+      - tree # Directory tree viewer
+      - unzip # Archive extraction
+      - curl # HTTP client
+      - wget # File downloader

@@ -11,9 +11,16 @@ modules:
 
   # Import all your existing modules
   - from-file: common-repos.yml
-  - from-file: common-packages.yml
+  - from-file: common-packages-surface.yml
   - from-file: surface-flatpaks.yml
-  - from-file: vpn-fix.yml
+
+  # Add fallback flatpak installation script
+  - type: files
+    files:
+      - source: scripts/install-surface-flatpaks.sh
+        destination: /usr/local/bin/install-surface-flatpaks.sh
+      - source: scripts/validate-flatpak-ids.sh
+        destination: /usr/local/bin/validate-flatpak-ids.sh
 
   # Surface-specific packages
   - type: rpm-ostree
