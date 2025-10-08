@@ -1,5 +1,5 @@
 modules:
-  - type: rpm-ostree
-    repos:
-      - https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-42.noarch.rpm
-      - https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-42.noarch.rpm
+  # Install RPM Fusion with retry logic via script
+  - type: script
+    scripts:
+      - install-rpmfusion.sh
