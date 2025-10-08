@@ -22,6 +22,18 @@ modules:
       - source: scripts/validate-flatpak-ids.sh
         destination: /usr/local/bin/validate-flatpak-ids.sh
 
+  # Microsoft fonts dependencies and installer
+  - type: rpm-ostree
+    install:
+      - curl
+      - cabextract
+      - fontconfig
+
+  # Install Microsoft Core Fonts via custom script
+  - type: script
+    scripts:
+      - install-ms-fonts-build.sh
+
   # Surface-specific packages
   - type: rpm-ostree
     install:
