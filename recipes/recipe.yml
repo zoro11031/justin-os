@@ -16,6 +16,10 @@ modules:
     files:
       - source: system
         destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
+      - source: scripts/install-common-flatpaks.sh
+        destination: /usr/local/bin/install-common-flatpaks.sh
+      - source: scripts/flatpak-auto-update.sh
+        destination: /usr/local/bin/flatpak-auto-update.sh
 
   - type: dnf
     repos:
