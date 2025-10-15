@@ -14,7 +14,9 @@ Two builds are available:
 ## What's Different from Stock?
 
 **Shells & Terminal**  
-Interactive shell is zsh with Oh My Zsh pre-configured. The main build uses dash as the system shell (`/bin/sh`) for faster scripts. Includes modern CLI tools: btop, bat, fzf, neovim, fastfetch, and starship prompt.
+Interactive shell is automatically changed to zsh with Oh My Zsh pre-configured on first boot. The main build uses dash as the system shell (`/bin/sh`) for faster scripts. Includes modern CLI tools: btop, bat, fzf, neovim, fastfetch, and starship prompt.
+
+All existing users will have their default shell changed to zsh automatically on first boot. New users will get zsh by default.
 
 **Development Tools**  
 Go, Python, micro editor, and starship prompt. Docker and libvirt for containers and VMs.
@@ -225,6 +227,31 @@ sudo /usr/local/bin/install-common-flatpaks.sh
 
 The service uses a stamp file (`/var/lib/justin-os/common-flatpaks-installed`) to track completion. It only runs once per deployment.
 
+### Shell didn't change to zsh
+
+The shell change happens automatically on first boot. Check if the service ran:
+
+```bash
+systemctl status change-user-shell-zsh.service
+```
+
+View the logs:
+```bash
+journalctl -u change-user-shell-zsh.service
+```
+
+Verify your shell:
+```bash
+echo $SHELL
+```
+
+If it didn't change automatically, you can change it manually:
+```bash
+chsh -s /usr/bin/zsh
+```
+
+Then log out and back in for the change to take effect.
+
 ### System shell compatibility (main build only)
 
 The main build uses dash as `/bin/sh` for POSIX compliance and performance. If you have scripts that require bash-specific features:
@@ -262,6 +289,7 @@ Additional documentation is available in the `docs/` folder:
 
 ## Features
 
+✅ **Auto-configured zsh** - Existing users automatically switched to zsh on first boot  
 ✅ **Zero maintenance flatpaks** - Install once on first boot, auto-update weekly  
 ✅ **Modern CLI tools** - bat, btop, fzf, neovim, starship, and more  
 ✅ **Development ready** - Go, Python, Docker, and libvirt pre-configured  
