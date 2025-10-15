@@ -4,6 +4,8 @@
 
 set -euo pipefail
 
+REPO_URL="https://raw.githubusercontent.com/zoro11031/justin-os/main"
+
 echo "=========================================="
 echo "Justin-OS Zsh Optimization Script"
 echo "=========================================="
@@ -86,14 +88,15 @@ fi
 
 # Install optimized .zshrc
 echo ""
-echo "Installing optimized .zshrc..."
-cp "files/home/.zshrc" "$HOME/.zshrc"
+echo "Installing optimized .zshrc from GitHub..."
+curl -fsSL "$REPO_URL/files/home/.zshrc" -o "$HOME/.zshrc"
 
 # Install custom config files
-echo "Installing custom zsh configs..."
-cp files/system/usr/share/oh-my-zsh/custom/alias.zsh "$ZSH_CUSTOM/"
-cp files/system/usr/share/oh-my-zsh/custom/benchmark.zsh "$ZSH_CUSTOM/"
-cp files/system/usr/share/oh-my-zsh/custom/custom_configs.zsh "$ZSH_CUSTOM/"
+echo "Installing custom zsh configs from GitHub..."
+mkdir -p "$ZSH_CUSTOM"
+curl -fsSL "$REPO_URL/files/system/usr/share/oh-my-zsh/custom/alias.zsh" -o "$ZSH_CUSTOM/alias.zsh"
+curl -fsSL "$REPO_URL/files/system/usr/share/oh-my-zsh/custom/benchmark.zsh" -o "$ZSH_CUSTOM/benchmark.zsh"
+curl -fsSL "$REPO_URL/files/system/usr/share/oh-my-zsh/custom/custom_configs.zsh" -o "$ZSH_CUSTOM/custom_configs.zsh"
 
 echo ""
 echo "=========================================="
