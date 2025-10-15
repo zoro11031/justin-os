@@ -1,6 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 # Change shell to zsh for all existing users on first boot
 # Runs once per deployment using a stamp file
+# POSIX-compliant for dash
 
 set -e
 
@@ -32,9 +33,16 @@ while IFS=: read -r username _ uid _ _ homedir shell; do
     fi
     
     # Skip if home directory doesn't exist or isn't under /home or /var/home
-    if [[ ! "$homedir" =~ ^(/home|/var/home)/ ]]; then
-        continue
-    fi
+    # POSIX-compliant pattern matching instead of bash regex
+    case "$homedir" in
+        /home/*|/var/home/*)
+            # Valid home directory, continue
+            ;;
+        *)
+            # Invalid, skip
+            continue
+            ;;
+    esac
     
     # Skip if already using zsh
     if [ "$shell" = "/usr/bin/zsh" ] || [ "$shell" = "/bin/zsh" ]; then
@@ -51,7 +59,8 @@ while IFS=: read -r username _ uid _ _ homedir shell; do
 done < /etc/passwd
 
 # Mark this deployment as complete
-mkdir -p "$(dirname "$STAMP_FILE")"
+STAMP_DIR="${STAMP_FILE%/*}"
+mkdir -p "$STAMP_DIR"
 CURRENT_DEPLOYMENT=$(rpm-ostree status --json | jq -r '.deployments[0].checksum')
 echo "$CURRENT_DEPLOYMENT" > "$STAMP_FILE"
 

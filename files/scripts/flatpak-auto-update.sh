@@ -1,6 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 # Weekly flatpak auto-update script
 # Updates both user and system flatpaks
+# POSIX-compliant for dash
 
 set -e
 
@@ -9,7 +10,7 @@ echo "Flatpak Auto-Update: $(date)"
 echo "=========================================="
 
 # Check if we're online
-if ! ping -c 1 flathub.org &> /dev/null; then
+if ! ping -c 1 flathub.org >/dev/null 2>&1; then
     echo "⚠ Cannot reach Flathub. Skipping update (may be offline)."
     exit 0
 fi
