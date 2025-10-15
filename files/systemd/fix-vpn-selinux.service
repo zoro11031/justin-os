@@ -5,7 +5,7 @@ Before=NetworkManager.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/fix-vpn-selinux.sh
+ExecStart=/usr/bin/fix-vpn-selinux.sh
 RemainAfterExit=yes
 StandardOutput=journal
 StandardError=journal

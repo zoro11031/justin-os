@@ -6,7 +6,7 @@ ConditionPathExists=/usr/bin/zsh
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/change-user-shell-zsh.sh
+ExecStart=/usr/bin/change-user-shell-zsh.sh
 RemainAfterExit=yes
 StandardOutput=journal
 StandardError=journal

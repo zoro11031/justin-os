@@ -6,7 +6,7 @@ modules:
   - type: files
     files:
       - source: scripts/fix-vpn-selinux.sh
-        destination: /usr/local/bin/fix-vpn-selinux.sh
+        destination: /usr/bin/fix-vpn-selinux.sh
 
       - source: systemd/fix-vpn-selinux.service
         destination: /usr/lib/systemd/system/fix-vpn-selinux.service

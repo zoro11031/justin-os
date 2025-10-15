@@ -21,7 +21,7 @@ modules:
       - source: system
         destination: /
       - source: scripts/install-surface-flatpaks.sh
-        destination: /usr/local/bin/install-surface-flatpaks.sh
+        destination: /usr/bin/install-surface-flatpaks.sh
 
   # Microsoft fonts dependencies and installer
   - type: rpm-ostree
