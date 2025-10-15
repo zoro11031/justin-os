@@ -8,6 +8,7 @@ modules:
       - fastfetch
       - zsh
       - dash # POSIX-compliant system shell
+      - util-linux-user # Provides chsh command
       - stow
       - yad
       - neovim

@@ -53,10 +53,11 @@ modules:
   - from-file: files.yml
   - from-file: common-flatpaks.yml
 
-  # Change system shell to dash (keeps zsh as interactive shell)
+  # Configure shells: dash for system (/bin/sh), zsh for users (default)
   - type: script
     scripts:
       - set-dash-as-sh.sh
+      - set-default-shell-zsh.sh
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
 
