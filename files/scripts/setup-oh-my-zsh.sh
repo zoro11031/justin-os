@@ -1,7 +1,7 @@
 #!/bin/bash
 # Install Oh My Zsh and essential plugins for all users
 
-set -e
+set -euo pipefail
 
 echo "Setting up Oh My Zsh framework..."
 
