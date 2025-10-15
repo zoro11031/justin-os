@@ -1,4 +1,8 @@
 modules:
+  - type: rpm-ostree
+    install:
+      - policycoreutils-python-utils # Provides semanage command for permanent SELinux fixes
+
   - type: files
     files:
       - source: scripts/fix-vpn-selinux.sh

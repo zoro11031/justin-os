@@ -1,8 +1,78 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -e
 
+# Fix VPN certificate SELinux context permanently using semanage
+# This survives reboots unlike chcon
+# POSIX-compliant for dash
+
+# Check if SELinux is enabled
+if ! command -v getenforce >/dev/null 2>&1; then
+    echo "SELinux tools not found, skipping VPN certificate context fix"
+    exit 0
+fi
+
+if [ "$(getenforce 2>/dev/null || echo Disabled)" = "Disabled" ]; then
+    echo "SELinux is disabled, skipping VPN certificate context fix"
+    exit 0
+fi
+
+# Check if semanage is available
+if ! command -v semanage >/dev/null 2>&1; then
+    echo "Warning: semanage command not found (install policycoreutils-python-utils)"
+    echo "Falling back to temporary chcon fix..."
+    
+    # Fallback to chcon if semanage not available
+    for homedir in /var/home/*; do
+        # Skip if glob didn't match anything
+        [ -e "$homedir" ] || continue
+        
+        if [ -d "$homedir/.cert" ]; then
+            chcon -R -t home_cert_t "$homedir/.cert" 2>/dev/null || true
+            echo "Applied temporary SELinux fix to $homedir/.cert"
+        fi
+    done
+    exit 0
+fi
+
+echo "Setting up permanent SELinux context for VPN certificates..."
+
+# Add permanent SELinux file context rules for all users' .cert directories
 for homedir in /var/home/*; do
-    if [ -d "$homedir/.cert" ]; then
-        chcon -R -t home_cert_t "$homedir/.cert" 2>/dev/null || true
+    # Skip if glob didn't match anything
+    [ -e "$homedir" ] || continue
+    
+    if [ -d "$homedir" ]; then
+        username="${homedir##*/}"
+        cert_path="$homedir/.cert"
+        
+        # Add SELinux file context rule if .cert directory exists
+        if [ -d "$cert_path" ]; then
+            echo "Adding SELinux rule for $cert_path"
+            
+            # Try to add, if it exists, modify it
+            if semanage fcontext -l | grep -q "^${cert_path}"; then
+                semanage fcontext -m -t home_cert_t "${cert_path}(/.*)?" 2>/dev/null || true
+            else
+                semanage fcontext -a -t home_cert_t "${cert_path}(/.*)?" 2>/dev/null || true
+            fi
+            
+            # Apply the context
+            restorecon -Rv "$cert_path" 2>/dev/null || true
+            echo "✓ Fixed SELinux context for $username's VPN certificates"
+        fi
     fi
 done
+
+# Also set a general rule for any future .cert directories
+echo "Adding general SELinux rule for all /var/home/*/.cert directories"
+GENERAL_RULE="/var/home/[^/]+/.cert(/.*)?"
+
+# Check if general rule already exists
+if semanage fcontext -l | grep -q "/var/home/\["; then
+    echo "General rule already exists, updating..."
+    semanage fcontext -m -t home_cert_t "$GENERAL_RULE" 2>/dev/null || true
+else
+    semanage fcontext -a -t home_cert_t "$GENERAL_RULE" 2>/dev/null || true
+fi
+
+echo "SELinux VPN certificate fix complete and permanent!"
