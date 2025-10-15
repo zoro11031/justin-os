@@ -34,6 +34,8 @@ modules:
   - type: script
     scripts:
       - install-ms-fonts-build.sh
+      - set-dash-as-sh.sh
+      - set-default-shell-zsh.sh
 
   # Surface-specific packages
   - type: rpm-ostree
