@@ -125,6 +125,8 @@ rpm-ostree status
 
 **Note:** Flatpaks install automatically on first boot via systemd service. The installation only runs once per deployment, so it won't slow down subsequent boots. Weekly auto-updates keep apps current.
 
+(They should install during the image build using the default-flatpaks module, but I've found it to be unreliable, so first-boot installation is more consistent.)
+
 #### Productivity & Office
 - Bitwarden (password manager)
 - Joplin (notes)
