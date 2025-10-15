@@ -13,6 +13,7 @@ modules:
   - from-file: common-repos.yml
   - from-file: common-packages-surface.yml
   - from-file: surface-flatpaks.yml
+  - from-file: dash-shell.yml
 
   # Copy system files (systemd services) and scripts
   - type: files
@@ -64,8 +65,3 @@ modules:
         - install-surface-flatpaks.service
 
   - type: signing
-
-  # Change /bin/sh to dash (MUST BE LAST - after all package operations)
-  - type: script
-    scripts:
-      - set-dash-as-sh.sh

@@ -1,0 +1,17 @@
+[Unit]
+Description=Change /bin/sh to dash (one-time)
+After=local-fs.target
+Before=sysinit.target
+DefaultDependencies=no
+ConditionPathExists=/usr/bin/dash
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash -c 'if [ -L /bin/sh ]; then rm -f /bin/sh; elif [ -f /bin/sh ]; then mv /bin/sh /bin/sh.backup; fi'
+ExecStart=/usr/bin/ln -sf /usr/bin/dash /bin/sh
+RemainAfterExit=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=sysinit.target
