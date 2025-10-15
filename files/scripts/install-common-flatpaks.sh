@@ -6,13 +6,13 @@ set -e
 
 STAMP_FILE="/var/lib/justin-os/common-flatpaks-installed"
 
-# Check if already run for this deployment
+# Check if already run for this deployment - exit silently if so
 if [ -f "$STAMP_FILE" ]; then
     CURRENT_DEPLOYMENT=$(rpm-ostree status --json | jq -r '.deployments[0].checksum')
     INSTALLED_DEPLOYMENT=$(cat "$STAMP_FILE")
     
     if [ "$CURRENT_DEPLOYMENT" = "$INSTALLED_DEPLOYMENT" ]; then
-        echo "Flatpaks already installed for this deployment. Exiting."
+        # Exit silently without any output to avoid triggering notifications
         exit 0
     fi
 fi
