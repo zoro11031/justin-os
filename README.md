@@ -1,38 +1,32 @@
 # justin-os &nbsp; [![bluebuild build badge](https://github.com/zoro11031/justin-os/actions/workflows/build.yml/badge.svg)](https://github.com/zoro11031/justin-os/actions/workflows/build.yml)
 
-A custom Fedora Atomic image for development and virtualization, based on Universal Blue.
+A custom Fedora Atomic image for development and daily use, based on Universal Blue.
 
 ## What is this?
 
-This is my personal Fedora Atomic image built with [BlueBuild](https://blue-build.org/). It's basically stock Fedora Kinoite/Silverblue with dev tools, virtualization, and utilities already layered in so you don't have to install them after rebasing.
+This is my personal Fedora Atomic image built with [BlueBuild](https://blue-build.org/). It's Fedora Kinoite/Silverblue with development tools, modern CLI utilities, and essential applications pre-configured.
 
 Two builds are available:
 
-- **main**: Fedora Kinoite with KDE Plasma
-- **surface**: Fedora Silverblue with GNOME (better for touchscreens) + linux-surface kernel
+- **justin-os**: Fedora Kinoite with KDE Plasma + dash system shell
+- **justin-os-surface**: Fedora Silverblue with GNOME + linux-surface kernel (bash system shell)
 
 ## What's Different from Stock?
 
-**Shells**  
-Your interactive shell is zsh. The system shell (`/bin/sh`) uses dash instead of bash for faster boot and script execution.
+**Shells & Terminal**  
+Interactive shell is zsh with Oh My Zsh pre-configured. The main build uses dash as the system shell (`/bin/sh`) for faster scripts. Includes modern CLI tools: btop, bat, fzf, neovim, fastfetch, and starship prompt.
 
-**Development**  
-Currently working with Go and Python, so those toolchains are included. Other languages and tools will be added as needed.
-
-**Virtualization**  
-Full libvirt/KVM stack with virt-manager, QEMU, and everything for running VMs out of the box.
-
-**CLI Tools**  
-Modern replacements: btop instead of top, bat instead of cat, plus fzf, neovim, fastfetch.
+**Development Tools**  
+Go, Python, micro editor, and starship prompt. Docker and libvirt for containers and VMs.
 
 **Repositories**  
-RPM Fusion (free and nonfree) comes pre-configured with retry logic for reliable builds.
+RPM Fusion (free and nonfree) pre-configured. Surface variant adds linux-surface repo.
 
-**Fonts**  
-Microsoft Core Fonts (Arial, Times New Roman, etc.) included in both builds for document compatibility.
+**Flatpaks**  
+Extensive collection of applications that install automatically on first boot via systemd service. Weekly auto-updates keep everything current without manual intervention.
 
-**Surface Extras**  
-The Surface build adds linux-surface kernel, touchscreen firmware (iptsd), and touch-friendly flatpaks.
+**Surface Extras (surface variant only)**  
+Linux-surface kernel for better hardware support, touchscreen firmware (iptsd), thermald for thermal management, and Surface SecureBoot certificate.
 
 ## Installation
 
@@ -75,82 +69,130 @@ rpm-ostree status
 
 ## What's Installed
 
-### Development
+### Development & Productivity
 
-- git, go, python3, pip
-- gopls (Go language server)
-- ShellCheck, shfmt (shell script tools)
-- docker, docker-compose
-- Node.js tooling (for language servers)
+- **Languages**: Go, Python 3
+- **Editors**: neovim, micro
+- **Shell**: zsh with Oh My Zsh (zsh-autosuggestions, zsh-completions, fast-syntax-highlighting, zsh-autopair)
+- **Prompt**: starship
+- **Containers/VMs**: docker, libvirt
+- **Version Control**: git
 
-_Languages and tools are added as needed - currently focused on Go and Python development._
+### Shell & CLI Tools
 
-### Virtualization
+- **Modern replacements**: bat (cat), btop (top), eza (ls)
+- **Utilities**: fzf, tree, rsync, stow, fastfetch
+- **System**: dash (system shell on main build), lm_sensors, htop
+- **Network**: curl, wget
+- **Archive**: unzip
+- **Scripting**: jq (JSON processor), dialog, yad
 
-- libvirt, qemu-kvm, virt-manager
-- virt-install, virt-viewer, virt-top
-- libvirt networking and KVM daemon
-- remmina (remote desktop)
-- spice-gtk, swtpm, edk2-ovmf
-- guestfs-tools, libguestfs
+### GUI Applications
 
-### Shell & Terminal
+- **System**: gnome-disk-utility
 
-- zsh (your shell), dash (system shell), bash (still available)
-- bat, btop, htop, fastfetch
-- fzf, tree, stow, dialog, yad
-- neovim, micro
-- lm_sensors
+### Flatpaks (Auto-installed on first boot)
 
-### System Stuff
+**Note:** Flatpaks install automatically on first boot via systemd service. The installation only runs once per deployment, so it won't slow down subsequent boots. Weekly auto-updates keep apps current.
 
-- curl, wget, rsync, unzip
-- gnome-disk-utility
-- Microsoft Core Fonts (both builds)
+#### Productivity & Office
+- Bitwarden (password manager)
+- Joplin (notes)
+- Anki (flashcards)
+- Nextcloud Desktop
+- LibreOffice
+- OnlyOffice
 
-### Flatpaks (Pre-configured)
+#### Communication
+- Discord
+- Zoom
 
-Apps install automatically after first boot (not during every boot - keeps things fast):
+#### Browsers
+- Brave Browser
+- Google Chrome
+- Mozilla Firefox
 
-- **Productivity**: Bitwarden, Joplin, Anki, Nextcloud
-- **Communication**: Discord, Zoom
-- **Browsers**: Brave, Chrome, Firefox
-- **Office**: LibreOffice, OnlyOffice
-- **Media**: Jellyfin, Plex, MPV, VLC
-- **Gaming**: Steam, ProtonPlus
-- **KDE Apps**: Gwenview, Kdenlive, Okular, and more
-- **Utilities**: Flatseal, Pods, BoxBuddy, Gear Lever
+#### Media & Entertainment
+- Jellyfin Media Player
+- Plexamp
+- Plex Desktop
+- MPV
+- VLC
+- Haruna (video player)
+- Elisa (music player)
 
-Apps update automatically every week via systemd timer. See `docs/FLATPAK_MANAGEMENT.md` for details.
+#### Gaming
+- Steam
+- ProtonPlus
+
+#### KDE Applications
+- Gwenview (image viewer)
+- KCalc (calculator)
+- Kdenlive (video editor)
+- KMahjongg, KMines (games)
+- KMyMoney (finance)
+- Kolourpaint (paint)
+- KRDC (remote desktop)
+- Okular (document viewer)
+- Skanpage (scanner)
+
+#### Development & Utilities
+- Pods (container management)
+- Flatseal (flatpak permissions)
+- BoxBuddy (toolbox manager)
+- Gear Lever (AppImage manager)
+- GNOME Calculator
+
+### Surface Build Additions
+
+The `justin-os-surface` variant includes:
+
+- **Kernel**: kernel-surface, kernel-surface-default-watchdog
+- **Touchscreen**: iptsd (touchscreen firmware)
+- **Hardware**: libwacom-surface, thermald
+- **Security**: surface-secureboot certificate
+- **Fonts**: Microsoft Core Fonts (Arial, Times New Roman, etc.)
+
+No system shell change (keeps bash as `/bin/sh` to avoid build issues).
 
 ## Build Your Own
 
 Want to customize it? Fork the repo and:
 
-1. Edit package lists in `recipes/`:
-   - `common-packages.yml` - core utilities
+1. **Edit package lists** in `recipes/`:
+   - `common-packages.yml` - core system utilities
    - `common-packages-dev.yml` - development tools
-   - `common-flatpaks.yml` - flatpak apps
-2. Update `recipe.yml` with your image name
-3. Push to GitHub (Actions will build it)
-4. Rebase to your custom image
+   - `common-flatpaks.yml` - flatpak applications
+   - `common-systemd.yml` - enabled services
+2. **Update image name** in `recipe.yml` (change `name:` field)
+3. **Push to GitHub** - Actions will automatically build your image
+4. **Rebase to your custom image** using the installation instructions above
 
-Check out the [BlueBuild docs](https://blue-build.org/learn/getting-started/) for more info.
+### Recipe Files
+
+- **recipe.yml** - Main KDE build configuration
+- **recipe-surface.yml** - Surface variant with GNOME and Surface kernel
+- **common-*.yml** - Shared modules used by both builds
+- **vpn-fix.yml** - SELinux fix for OpenVPN certificates
+- **dash-shell.yml** - Dash shell configuration (main build only)
+
+Check out the [BlueBuild docs](https://blue-build.org/learn/getting-started/) for more details on customization.
 
 ## Requirements
 
-**Minimum:**
+**Hardware:**
+- x86_64 CPU
+- 8 GB RAM minimum (16 GB recommended)
+- 30 GB free disk space minimum
+- SSD recommended for best performance
 
-- x86_64 CPU with virtualization (Intel VT-x / AMD-V)
-- 8 GB RAM (16 GB if running VMs)
-- 30 GB free disk space
-- Fedora Atomic 39+
+**Software:**
+- Existing Fedora Atomic installation (Silverblue, Kinoite, or any Universal Blue variant)
+- Fedora 42 or compatible version
 
-**Recommended:**
-
-- Modern multi-core CPU
-- 16 GB+ RAM
-- SSD with 50+ GB space
+**For Surface variant:**
+- Microsoft Surface device (tested on Surface Pro 7)
+- Secure Boot support recommended (Surface SecureBoot certificate included)
 
 ## Verification
 
@@ -164,28 +206,69 @@ The `cosign.pub` file is in this repo.
 
 ## Troubleshooting
 
-**RPM Fusion download fails?**  
-Retry the build. The image uses retry logic but sometimes mirrors are flaky.
+### Flatpaks won't install on first boot
 
-**Flatpaks won't install?**  
-Check the service status: `systemctl status install-common-flatpaks.service`  
-Or run manually: `sudo /usr/local/bin/install-common-flatpaks.sh`
+Check the service status:
+```bash
+systemctl status install-common-flatpaks.service
+```
 
-See `docs/FLATPAK_MANAGEMENT.md` for troubleshooting.
+View the service logs:
+```bash
+journalctl -u install-common-flatpaks.service
+```
 
-**Script breaks with /bin/sh?**  
-The system shell is dash (POSIX-compliant). Use `#!/bin/bash` for bash-specific scripts or run with `bash script.sh`.
+Run manually if needed:
+```bash
+sudo /usr/local/bin/install-common-flatpaks.sh
+```
 
-See `docs/SYSTEM_SHELL.md` for details.
+The service uses a stamp file (`/var/lib/justin-os/common-flatpaks-installed`) to track completion. It only runs once per deployment.
 
-## More Info
+### System shell compatibility (main build only)
 
-Docs are in the `docs/` folder:
+The main build uses dash as `/bin/sh` for POSIX compliance and performance. If you have scripts that require bash-specific features:
 
-- `FLATPAK_MANAGEMENT.md` - one-time installs + weekly auto-updates
-- `SYSTEM_SHELL.md` - dash vs bash
-- `SURFACE_FLATPAKS.md` - Surface-specific flatpaks
-- `MICROSOFT_FONTS.md` - font installation
+- Use `#!/bin/bash` shebang in your scripts
+- Or run with `bash script.sh` explicitly
+- See `docs/SYSTEM_SHELL.md` for details
+
+The Surface build keeps bash as the system shell to avoid compatibility issues.
+
+### RPM Fusion download fails
+
+The build includes retry logic, but mirrors can occasionally be slow or unavailable. If a build fails, retry it - builds are cached and subsequent attempts are faster.
+
+### Surface SecureBoot enrollment
+
+After installing the Surface variant, enroll the Surface SecureBoot certificate:
+
+```bash
+sudo mokutil --import /usr/share/surface-secureboot/surface.cer
+```
+
+Follow the prompts and reboot to complete enrollment.
+
+See `docs/` folder for more troubleshooting guides.
+
+## Documentation
+
+Additional documentation is available in the `docs/` folder:
+
+- **FLATPAK_MANAGEMENT.md** - How flatpak auto-installation and updates work
+- **SYSTEM_SHELL.md** - Dash vs bash system shell differences
+- **SURFACE_FLATPAKS.md** - Surface-specific flatpak applications
+- **MICROSOFT_FONTS.md** - Microsoft Core Fonts installation (Surface build)
+
+## Features
+
+✅ **Zero maintenance flatpaks** - Install once on first boot, auto-update weekly  
+✅ **Modern CLI tools** - bat, btop, fzf, neovim, starship, and more  
+✅ **Development ready** - Go, Python, Docker, and libvirt pre-configured  
+✅ **Oh My Zsh included** - With popular plugins pre-installed  
+✅ **Signed images** - Cryptographically signed with cosign for security  
+✅ **Surface optimized** - Dedicated build with linux-surface kernel  
+✅ **RPM Fusion enabled** - Free and nonfree repositories ready to use
 
 ## Credits
 
