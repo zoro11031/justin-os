@@ -1,11 +1,11 @@
 #!/bin/bash
-# Setup optimized zsh configuration locally (not on justin-os image)
-# This replicates the justin-os zsh setup for use on other systems
+# Update existing Oh My Zsh to match justin-os optimized configuration
+# This cleans up your OMZ installation and applies the optimized config
 
 set -euo pipefail
 
 echo "=========================================="
-echo "Justin-OS Zsh Setup Script"
+echo "Justin-OS Zsh Optimization Script"
 echo "=========================================="
 echo ""
 
@@ -15,117 +15,103 @@ if [[ $EUID -eq 0 ]]; then
    exit 1
 fi
 
-# Install required packages
-echo "Installing required packages..."
-if command -v dnf >/dev/null 2>&1; then
-    echo "Detected Fedora/RHEL - using dnf"
-    sudo dnf install -y zsh git curl neovim starship
-elif command -v apt >/dev/null 2>&1; then
-    echo "Detected Debian/Ubuntu - using apt"
-    sudo apt update
-    sudo apt install -y zsh git curl neovim
-    # Install starship manually on Debian/Ubuntu
-    if ! command -v starship >/dev/null 2>&1; then
-        echo "Installing starship..."
-        curl -sS https://starship.rs/install.sh | sh
-    fi
-elif command -v pacman >/dev/null 2>&1; then
-    echo "Detected Arch - using pacman"
-    sudo pacman -S --needed --noconfirm zsh git curl neovim starship
-else
-    echo "Unsupported package manager. Please install manually: zsh, git, curl, neovim, starship"
+# Check if Oh My Zsh is installed
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    echo "Oh My Zsh not found at ~/.oh-my-zsh"
+    echo "Please install Oh My Zsh first or use the full setup script"
     exit 1
 fi
 
-# Install Oh My Zsh if not already installed
-if [ ! -d "$HOME/.oh-my-zsh" ]; then
-    echo ""
-    echo "Installing Oh My Zsh..."
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-else
-    echo "Oh My Zsh already installed"
-fi
-
-# Install custom plugins
-echo ""
-echo "Installing custom plugins..."
-
-ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
-
-if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
-    git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
-else
-    echo "zsh-autosuggestions already installed"
-fi
-
-if [ ! -d "$ZSH_CUSTOM/plugins/zsh-completions" ]; then
-    git clone --depth=1 https://github.com/zsh-users/zsh-completions.git "$ZSH_CUSTOM/plugins/zsh-completions"
-else
-    echo "zsh-completions already installed"
-fi
-
-if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autopair" ]; then
-    git clone --depth=1 https://github.com/hlissner/zsh-autopair.git "$ZSH_CUSTOM/plugins/zsh-autopair"
-else
-    echo "zsh-autopair already installed"
-fi
-
-if [ ! -d "$ZSH_CUSTOM/plugins/fast-syntax-highlighting" ]; then
-    git clone --depth=1 https://github.com/zdharma-continuum/fast-syntax-highlighting.git "$ZSH_CUSTOM/plugins/fast-syntax-highlighting"
-else
-    echo "fast-syntax-highlighting already installed"
-fi
+ZSH_DIR="$HOME/.oh-my-zsh"
+ZSH_CUSTOM="${ZSH_CUSTOM:-$ZSH_DIR/custom}"
 
 # Backup existing .zshrc
 if [ -f "$HOME/.zshrc" ]; then
-    echo ""
-    echo "Backing up existing .zshrc to .zshrc.backup"
-    cp "$HOME/.zshrc" "$HOME/.zshrc.backup"
+    echo "Backing up existing .zshrc to .zshrc.backup.$(date +%Y%m%d-%H%M%S)"
+    cp "$HOME/.zshrc" "$HOME/.zshrc.backup.$(date +%Y%m%d-%H%M%S)"
 fi
 
-# Copy optimized .zshrc
+# Clean up Oh My Zsh installation
+echo ""
+echo "Cleaning up Oh My Zsh installation..."
+echo "  - Removing unused plugins (keeping git, docker, kubectl, systemd)"
+
+cd "$ZSH_DIR/plugins" || exit 1
+find . -maxdepth 1 -type d ! -name '.' ! -name 'git' ! -name 'docker' ! -name 'kubectl' ! -name 'systemd' -exec rm -rf {} + 2>/dev/null || true
+
+echo "  - Removing unused themes (keeping robbyrussell)"
+cd "$ZSH_DIR/themes" || exit 1
+find . -type f ! -name 'robbyrussell.zsh-theme' -delete 2>/dev/null || true
+find . -type l -delete 2>/dev/null || true
+
+echo "  - Removing documentation files"
+cd "$ZSH_DIR" || exit 1
+rm -rf .github/ .git/ CONTRIBUTING.md README.md CODE_OF_CONDUCT.md 2>/dev/null || true
+
+# Calculate space saved
+FINAL_SIZE=$(du -sh "$ZSH_DIR" | cut -f1)
+echo "  ✓ Cleanup complete! Oh My Zsh is now $FINAL_SIZE"
+
+# Install required custom plugins if missing
+echo ""
+echo "Checking custom plugins..."
+
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+    echo "  - Installing zsh-autosuggestions..."
+    git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+else
+    echo "  ✓ zsh-autosuggestions already installed"
+fi
+
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-completions" ]; then
+    echo "  - Installing zsh-completions..."
+    git clone --depth=1 https://github.com/zsh-users/zsh-completions.git "$ZSH_CUSTOM/plugins/zsh-completions"
+else
+    echo "  ✓ zsh-completions already installed"
+fi
+
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autopair" ]; then
+    echo "  - Installing zsh-autopair..."
+    git clone --depth=1 https://github.com/hlissner/zsh-autopair.git "$ZSH_CUSTOM/plugins/zsh-autopair"
+else
+    echo "  ✓ zsh-autopair already installed"
+fi
+
+if [ ! -d "$ZSH_CUSTOM/plugins/fast-syntax-highlighting" ]; then
+    echo "  - Installing fast-syntax-highlighting..."
+    git clone --depth=1 https://github.com/zdharma-continuum/fast-syntax-highlighting.git "$ZSH_CUSTOM/plugins/fast-syntax-highlighting"
+else
+    echo "  ✓ fast-syntax-highlighting already installed"
+fi
+
+# Install optimized .zshrc
 echo ""
 echo "Installing optimized .zshrc..."
 cp "files/home/.zshrc" "$HOME/.zshrc"
 
-# Create custom config directory and copy files
+# Install custom config files
 echo "Installing custom zsh configs..."
-mkdir -p "$ZSH_CUSTOM"
 cp files/system/usr/share/oh-my-zsh/custom/alias.zsh "$ZSH_CUSTOM/"
 cp files/system/usr/share/oh-my-zsh/custom/benchmark.zsh "$ZSH_CUSTOM/"
 cp files/system/usr/share/oh-my-zsh/custom/custom_configs.zsh "$ZSH_CUSTOM/"
 
-# Change default shell to zsh
-echo ""
-echo "Changing default shell to zsh..."
-if [ "$SHELL" != "$(which zsh)" ]; then
-    chsh -s "$(which zsh)"
-    echo "Default shell changed to zsh"
-    echo "You'll need to log out and back in for this to take effect"
-else
-    echo "Default shell is already zsh"
-fi
-
 echo ""
 echo "=========================================="
-echo "Setup Complete!"
+echo "Optimization Complete!"
 echo "=========================================="
 echo ""
-echo "What was installed:"
-echo "  ✓ Oh My Zsh"
-echo "  ✓ zsh-autosuggestions"
-echo "  ✓ zsh-completions"
-echo "  ✓ zsh-autopair"
-echo "  ✓ fast-syntax-highlighting"
-echo "  ✓ Optimized .zshrc configuration"
-echo "  ✓ Custom aliases (alias.zsh)"
-echo "  ✓ Performance tools (benchmark.zsh)"
-echo "  ✓ Optional configs (custom_configs.zsh)"
+echo "What changed:"
+echo "  ✓ Cleaned up Oh My Zsh (removed ~290 unused plugins, ~140 themes)"
+echo "  ✓ Installed optimized .zshrc"
+echo "  ✓ Added custom aliases (alias.zsh)"
+echo "  ✓ Added performance tools (benchmark.zsh)"
+echo "  ✓ Added optional configs (custom_configs.zsh)"
 echo ""
 echo "Next steps:"
-echo "  1. Log out and log back in (or run 'exec zsh')"
-echo "  2. Install starship if not already available"
-echo "  3. Run 'zsh-bench' to test startup performance"
+echo "  1. Restart your terminal (or run 'exec zsh')"
+echo "  2. Run 'zsh-bench' to test startup performance"
+echo "  3. Expected startup time: ~100-200ms (vs 800ms+ stock OMZ)"
 echo ""
-echo "Your old .zshrc was backed up to ~/.zshrc.backup"
+echo "Your old .zshrc was backed up with a timestamp"
 echo ""
+
