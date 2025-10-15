@@ -1,10 +1,10 @@
 #!/bin/bash
-# Post-installation script to install Surface flatpaks
+# Post-installation script to install common flatpaks
 # Runs once after rebase/update, tracks completion with a stamp file
 
 set -e
 
-STAMP_FILE="/var/lib/justin-os/surface-flatpaks-installed"
+STAMP_FILE="/var/lib/justin-os/common-flatpaks-installed"
 
 # Check if already run for this deployment
 if [ -f "$STAMP_FILE" ]; then
@@ -17,53 +17,63 @@ if [ -f "$STAMP_FILE" ]; then
     fi
 fi
 
-echo "Installing Surface-optimized Flatpaks..."
+echo "Installing common Flatpaks..."
 
 # Ensure Flathub is added
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
 # Array of flatpak IDs to install
 FLATPAKS=(
-    # Browsers (touch-friendly)
-    "com.brave.Browser"
-    "com.google.Chrome"
-    
-    # GNOME Core Apps
-    "org.gnome.Calculator"
-    "org.gnome.Calendar"
-    "org.gnome.Cheese"
-    "org.gnome.Contacts"
-    "org.gnome.Evince"
-    "org.gnome.Loupe"
-    "org.gnome.Maps"
-    "org.gnome.TextEditor"
-    "org.gnome.Weather"
-    "org.gnome.clocks"
-    "org.gnome.Snapshot"
-    
     # Productivity
     "com.bitwarden.desktop"
     "net.cozic.joplin_desktop"
     "net.ankiweb.Anki"
     "com.nextcloud.desktopclient.nextcloud"
     
+    # Browsers
+    "com.brave.Browser"
+    "com.google.Chrome"
+    "org.mozilla.firefox"
+    
     # Communication
     "com.discordapp.Discord"
+    "us.zoom.Zoom"
     
-    # Media (touch-friendly players)
+    # Media
     "com.github.iwalton3.jellyfin-media-player"
     "com.plexamp.Plexamp"
     "tv.plex.PlexDesktop"
+    "io.mpv.Mpv"
+    "org.videolan.VLC"
+    "org.kde.haruna"
+    "org.kde.elisa"
     
-    # Drawing/Notes (stylus support)
-    "com.github.xournalpp.xournalpp"
-    "org.kde.krita"
+    # Gaming
+    "com.valvesoftware.Steam"
+    "com.vysp3r.ProtonPlus"
     
     # Office
     "org.libreoffice.LibreOffice"
+    "org.onlyoffice.desktopeditors"
+    
+    # KDE Apps
+    "org.kde.gwenview"
+    "org.kde.kcalc"
+    "org.kde.kdenlive"
+    "org.kde.kmahjongg"
+    "org.kde.kmines"
+    "org.kde.kmymoney"
+    "org.kde.kolourpaint"
+    "org.kde.krdc"
+    "org.kde.okular"
+    "org.kde.skanpage"
     
     # Utilities
+    "com.github.marhkb.Pods"
     "com.github.tchx84.Flatseal"
+    "io.github.dvlv.boxbuddyrs"
+    "it.mijorus.gearlever"
+    "org.gnome.Calculator"
 )
 
 # Install each flatpak, skipping ones that fail

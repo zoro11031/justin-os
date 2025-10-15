@@ -1,0 +1,12 @@
+[Unit]
+Description=Install common Flatpak applications (one-time per deployment)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/install-common-flatpaks.sh
+
+[Install]
+WantedBy=multi-user.target
