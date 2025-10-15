@@ -14,11 +14,13 @@ modules:
   - from-file: common-packages-surface.yml
   - from-file: surface-flatpaks.yml
 
-  # Copy system files (includes scripts and systemd services)
+  # Copy system files (systemd services) and scripts
   - type: files
     files:
       - source: system
         destination: /
+      - source: scripts/install-surface-flatpaks.sh
+        destination: /usr/local/bin/install-surface-flatpaks.sh
 
   # Microsoft fonts dependencies and installer
   - type: rpm-ostree
