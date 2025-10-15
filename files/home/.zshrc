@@ -60,6 +60,19 @@ zstyle ':completion:*' squeeze-slashes true
 zstyle ':completion:*' menu select
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
+# Group completions by type
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
+
+# Partial completion suggestions (like Fish)
+zstyle ':completion:*' list-suffixes
+zstyle ':completion:*' expand prefix suffix
+
+# Fuzzy matching for typos
+zstyle ':completion:*' completer _complete _match _approximate
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:approximate:*' max-errors 1 numeric
+
 # ========================================
 # Directory Navigation
 # ========================================
@@ -67,13 +80,25 @@ setopt AUTO_CD              # If a command is not found but is a directory, cd i
 setopt AUTO_PUSHD           # Make cd push the old directory onto the directory stack
 setopt PUSHD_IGNORE_DUPS    # Don't push multiple copies of the same directory
 setopt PUSHD_SILENT         # Don't print the directory stack after pushd or popd
+setopt PUSHD_MINUS          # Exchange meanings of +/- when navigating the dir stack
+
+# Directory aliases for quick navigation
+alias -g ...='../..'
+alias -g ....='../../..'
+alias -g .....='../../../..'
+alias d='dirs -v | head -10'  # Show last 10 directories
 
 # ========================================
-# Correction
+# Correction & Globbing
 # ========================================
 setopt CORRECT              # Command correction
 CORRECT_IGNORE='_*'
 CORRECT_IGNORE_FILE='.*'
+
+# Extended globbing for advanced pattern matching
+setopt EXTENDED_GLOB        # Use extended globbing (#, ~, ^)
+setopt GLOB_DOTS            # Don't require leading '.' in filename to be matched explicitly
+setopt NO_NOMATCH           # Pass through unmatched globs to the command
 
 # ========================================
 # Load Essential OMZ Libraries (Minimal)
@@ -219,3 +244,47 @@ unset config_file
 # Additional Environment Variables
 # ========================================
 export WINAPPS_SRC_DIR="$HOME/.local/bin/winapps-src"
+
+# Better less defaults
+export LESS='-F -g -i -M -R -S -w -X -z-4'
+export LESSHISTFILE='-'  # Disable less history file
+
+# Colorized output for common commands
+export CLICOLOR=1
+export GREP_COLOR='1;32'
+
+# ========================================
+# Performance: Reduce escape sequence timeout
+# ========================================
+# Makes key combinations faster (especially ESC)
+export KEYTIMEOUT=1
+
+# ========================================
+# Quick Utility Functions
+# ========================================
+# Create and cd into directory
+mkcd() {
+  mkdir -p "$1" && cd "$1"
+}
+
+# Extract any archive
+extract() {
+  if [ -f "$1" ]; then
+    case "$1" in
+      *.tar.bz2)   tar xjf "$1"    ;;
+      *.tar.gz)    tar xzf "$1"    ;;
+      *.bz2)       bunzip2 "$1"    ;;
+      *.rar)       unrar x "$1"    ;;
+      *.gz)        gunzip "$1"     ;;
+      *.tar)       tar xf "$1"     ;;
+      *.tbz2)      tar xjf "$1"    ;;
+      *.tgz)       tar xzf "$1"    ;;
+      *.zip)       unzip "$1"      ;;
+      *.Z)         uncompress "$1" ;;
+      *.7z)        7z x "$1"       ;;
+      *)           echo "'$1' cannot be extracted via extract()" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
