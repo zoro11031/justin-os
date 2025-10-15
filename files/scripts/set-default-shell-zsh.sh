@@ -2,7 +2,7 @@
 # Set zsh as the default shell in /etc/passwd for new users
 # This makes $SHELL return /usr/bin/zsh
 
-set -e
+set -euo pipefail
 
 echo "Setting zsh as default shell..."
 
