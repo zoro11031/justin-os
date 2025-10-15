@@ -30,11 +30,10 @@ modules:
       - xorg-x11-font-utils # Required by msttcore-fonts-installer
       - fontconfig
 
-  # Install Microsoft Core Fonts via custom script
+  # Install Microsoft Core Fonts and configure zsh (BEFORE changing /bin/sh)
   - type: script
     scripts:
       - install-ms-fonts-build.sh
-      - set-dash-as-sh.sh
       - set-default-shell-zsh.sh
       - setup-oh-my-zsh.sh
 
@@ -65,3 +64,8 @@ modules:
         - install-surface-flatpaks.service
 
   - type: signing
+
+  # Change /bin/sh to dash (MUST BE LAST - after all package operations)
+  - type: script
+    scripts:
+      - set-dash-as-sh.sh
