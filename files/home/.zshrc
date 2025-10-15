@@ -2,7 +2,12 @@
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
 # Path to your Oh My Zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
+# Use system-wide installation if available, otherwise use user installation
+if [ -d "/usr/share/oh-my-zsh" ]; then
+  export ZSH="/usr/share/oh-my-zsh"
+else
+  export ZSH="$HOME/.oh-my-zsh"
+fi
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time Oh My Zsh is loaded, in which case,
@@ -71,18 +76,29 @@ ZSH_THEME="robbyrussell"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-git
-z
-fzf
-history-substring-search
-zsh-autosuggestions
-#zsh-syntax-highlighting
-zsh-completions
-zsh-autopair
-command-not-found
-sudo  # built-in: press ESC twice to add sudo
-fast-syntax-highlighting
+  git
+  z
+  fzf
+  history-substring-search
+  zsh-autosuggestions
+  zsh-completions
+  zsh-autopair
+  command-not-found
+  sudo  # built-in: press ESC twice to add sudo
+  fast-syntax-highlighting
 )
+
+# Make autosuggestions faster and more Fish-like
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+
+# Fish-like history
+setopt HIST_IGNORE_ALL_DUPS  # Don't record duplicates
+setopt HIST_FIND_NO_DUPS     # Don't show duplicates in search
+setopt SHARE_HISTORY         # Share history across sessions
+
+# Case-insensitive completion
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
 export FZF_BASE=/usr/share/fzf
 
