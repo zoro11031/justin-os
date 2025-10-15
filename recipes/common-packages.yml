@@ -7,6 +7,7 @@ modules:
       - dialog
       - fastfetch
       - zsh
+      - dash # POSIX-compliant system shell
       - stow
       - yad
       - neovim
@@ -23,3 +24,4 @@ modules:
       - unzip # Archive extraction
       - curl # HTTP client
       - wget # File downloader
+      - jq # JSON processor

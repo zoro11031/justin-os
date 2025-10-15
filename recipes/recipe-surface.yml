@@ -14,13 +14,11 @@ modules:
   - from-file: common-packages-surface.yml
   - from-file: surface-flatpaks.yml
 
-  # Add fallback flatpak installation script
+  # Copy system files (includes scripts and systemd services)
   - type: files
     files:
-      - source: scripts/install-surface-flatpaks.sh
-        destination: /usr/local/bin/install-surface-flatpaks.sh
-      - source: scripts/validate-flatpak-ids.sh
-        destination: /usr/local/bin/validate-flatpak-ids.sh
+      - source: system
+        destination: /
 
   # Microsoft fonts dependencies and installer
   - type: rpm-ostree
@@ -54,10 +52,11 @@ modules:
       - libwacom
       - libwacom-data
 
-  # Enable thermald for better thermal management
+  # Enable services
   - type: systemd
     system:
       enabled:
         - thermald.service
+        - install-surface-flatpaks.service
 
   - type: signing

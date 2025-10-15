@@ -4,11 +4,28 @@
 
 The Surface variant attempts to install flatpaks automatically during the image build via the `surface-flatpaks.yml` module.
 
-## Manual Installation (Post-Build Fallback)
+## Post-Deployment Installation (Automatic, One-Time)
 
-If the flatpak module fails during build or if you want to reinstall the apps later, a fallback script is included in the image.
+If flatpaks aren't installed during the build (or after a system update), a systemd system service automatically runs the installation script on boot.
 
-### Running the Fallback Script
+### How It Works
+
+1. **First boot after rebase/update**: The `install-surface-flatpaks.service` runs automatically during system startup
+2. **Script checks deployment**: Compares current deployment checksum with stamp file
+3. **Installs if needed**: If no stamp exists or deployment changed, flatpaks are installed
+4. **Creates stamp**: Saves deployment checksum to `/var/lib/justin-os/surface-flatpaks-installed`
+5. **Subsequent boots**: Script exits immediately if already run for this deployment
+
+This means:
+
+- ✅ Runs once per deployment (after rebase or update)
+- ✅ Doesn't run on every boot
+- ✅ Automatically handles updates (new deployments get new flatpaks)
+- ✅ Safe to leave enabled
+
+## Manual Installation (Fallback)
+
+If you want to manually run the installation:
 
 ```bash
 # Run the post-installation script
@@ -51,7 +68,50 @@ To customize which apps are installed:
 
 1. Edit `/usr/local/bin/install-surface-flatpaks.sh`
 2. Modify the `FLATPAKS` array
-3. Run the script again
+3. Delete the stamp file to force reinstall: `sudo rm /var/lib/justin-os/surface-flatpaks-installed`
+4. Run the script again or reboot
+
+## Checking Installation Status
+
+View the stamp file to see what deployment has flatpaks installed:
+
+```bash
+cat /var/lib/justin-os/surface-flatpaks-installed
+```
+
+Check systemd service status:
+
+```bash
+systemctl status install-surface-flatpaks.service
+```
+
+View logs:
+
+```bash
+journalctl -u install-surface-flatpaks.service
+```
+
+## Force Reinstall
+
+To force reinstallation on next boot:
+
+```bash
+sudo rm /var/lib/justin-os/surface-flatpaks-installed
+```
+
+Or run immediately:
+
+```bash
+sudo /usr/local/bin/install-surface-flatpaks.sh
+```
+
+## Disabling Automatic Installation
+
+If you don't want the automatic installation:
+
+```bash
+sudo systemctl disable install-surface-flatpaks.service
+```
 
 ## Validation Status
 

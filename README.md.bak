@@ -1,0 +1,343 @@
+# justin-os &nbsp; [![bluebuild build badge](https://github.com/zoro11031/justin-os/actions/workflows/build.yml/badge.svg)](https://github.com/zoro11031/justin-os/actions/workflows/build.yml)
+
+A custom Fedora Atomic image for development and virtualization, based on Universal Blue.
+
+## What is this?
+
+This is my personal Fedora Atomic image built with [BlueBuild](https://blue-build.org/). It's essentially stock Fedora Kinoite/Silverblue with a bunch of dev tools, virtualization stuff, and utilities already layered in so you don't have to install them yourself after rebasing.
+
+Two flavors exist: the main build runs KDE Plasma, and there's a Surface variant with GNOME (better for touchscreens) plus the linux-surface kernel for Surface hardware support.
+
+## What's Different from Stock?
+
+### Shells
+Your interactive shell is zsh. The system shell (`/bin/sh`) uses dash instead of bash for faster boot and script execution.
+
+### Development
+Git, Go, Python, Node.js, Docker, and common dev tools are already installed. No need to layer packages after deployment.
+
+### Virtualization  
+Full libvirt/KVM stack with virt-manager, QEMU, and everything you need to run VMs without post-install setup.
+
+### CLI Tools
+Modern replacements for standard tools: btop instead of top, bat instead of cat, plus fzf, neovim, fastfetch, and others.
+
+### Repositories
+RPM Fusion (free and nonfree) comes pre-configured with retry logic to handle flaky mirrors during builds.
+
+### Fonts
+Microsoft Core Fonts (Arial, Times New Roman, etc.) are included in both variants for better document compatibility.
+
+### Surface Extras
+The Surface build adds the linux-surface kernel, touchscreen firmware (iptsd), and touch-friendly apps.
+
+## Two Variants
+
+**justin-os** (main)  
+- Fedora Kinoite 42 base  
+- KDE Plasma desktop  
+- Standard kernel  
+- For regular PCs and laptops
+
+**justin-os-surface**  
+- Fedora Silverblue 42 base  
+- GNOME desktop (touchscreen-friendly)  
+- Linux Surface kernel  
+- Surface-specific drivers and firmware  
+- Touch-optimized flatpaks
+
+## Installation
+
+You need an existing Fedora Atomic install (Silverblue, Kinoite, or any uBlue variant).
+
+### Main Variant (KDE)
+
+First time setup with unsigned image:
+```bash
+rpm-ostree rebase ostree-unverified-registry:ghcr.io/zoro11031/justin-os:latest
+systemctl reboot
+```
+
+After reboot, switch to signed image:
+```bash
+rpm-ostree rebase ostree-image-signed:docker://ghcr.io/zoro11031/justin-os:latest
+systemctl reboot
+```
+
+### Surface Variant (GNOME)
+
+Same process, different image:
+```bash
+rpm-ostree rebase ostree-unverified-registry:ghcr.io/zoro11031/justin-os-surface:latest
+systemctl reboot
+
+# Then after reboot:
+rpm-ostree rebase ostree-image-signed:docker://ghcr.io/zoro11031/justin-os-surface:latest
+systemctl reboot
+```
+
+Check it worked:
+```bash
+rpm-ostree status
+```
+
+## Project Overview
+
+**justin-os** is a custom immutable Fedora Kinoite image based on the [Universal Blue](https://universal-blue.org/) project and built using the [BlueBuild](https://blue-build.org/) framework. It comes pre-configured with development tools, virtualization stack, system utilities, and quality-of-life improvements for developers and power users.
+
+This image is designed to provide a ready-to-use development environment without the need to layer additional packages post-installation.
+
+## Features
+
+- **Development Tools**: Pre-layered Git, Go, Node.js, Python, Docker, and more
+- **Virtualization Stack**: Complete libvirt/KVM setup with virt-manager and QEMU
+- **Shell Environment**: Zsh as the default interactive shell; dash as the system shell (`/bin/sh`) for POSIX compliance and performance
+- **System Utilities**: Modern CLI tools (btop, fastfetch, bat, fzf, neovim)
+- **RPM Fusion**: Both free and non-free repositories included with retry logic for reliable builds
+- **Custom Services**: OpenVPN SELinux context fix via systemd service
+- **Containerization**: Docker and Docker Compose pre-installed
+- **Microsoft Core Fonts**: Included for document compatibility (Surface variant only)
+
+## Variants
+
+### justin-os (Main)
+
+**Base**: Fedora Kinoite 42  
+**Desktop**: KDE Plasma  
+**Target**: General development and virtualization
+
+### justin-os-surface
+
+**Base**: Fedora Silverblue 42  
+**Desktop**: GNOME  
+**Target**: Microsoft Surface devices  
+**Additions**:
+
+- Linux Surface kernel and firmware
+- Touch-optimized apps
+- Microsoft Core Fonts
+- IPTSD for touchscreen support
+
+## Installation
+
+### Prerequisites
+
+- An existing Fedora Atomic (Silverblue, Kinoite, etc.) installation
+- Or any Universal Blue derivative
+
+### Rebase from Stock Fedora
+
+**Step 1**: Rebase to the unsigned image to install signing keys:
+
+```bash
+rpm-ostree rebase ostree-unverified-registry:ghcr.io/zoro11031/justin-os:latest
+```
+
+**Step 2**: Reboot to apply changes:
+
+```bash
+systemctl reboot
+```
+
+**Step 3**: Rebase to the signed image:
+
+```bash
+rpm-ostree rebase ostree-image-signed:docker://ghcr.io/zoro11031/justin-os:latest
+```
+
+**Step 4**: Reboot to complete installation:
+
+```bash
+systemctl reboot
+```
+
+### Surface Variant
+
+For Microsoft Surface devices, use the `justin-os-surface` image:
+
+```bash
+# Unsigned (first rebase)
+rpm-ostree rebase ostree-unverified-registry:ghcr.io/zoro11031/justin-os-surface:latest
+
+# After reboot, switch to signed
+rpm-ostree rebase ostree-image-signed:docker://ghcr.io/zoro11031/justin-os-surface:latest
+```
+
+### Verify Installation
+
+Check your current image:
+
+```bash
+rpm-ostree status
+```
+
+You should see `ghcr.io/zoro11031/justin-os` in the deployment list.
+
+## Included Packages
+
+### Development Tools
+
+- **Version Control**: git
+- **Languages**: go, gopls, python3, nodejs
+- **Package Managers**: npm, pip
+- **Linters/Formatters**: ShellCheck, shfmt
+- **Language Servers**: nodejs-bash-language-server, gopls
+- **Containers**: docker, docker-compose
+
+### Virtualization
+
+- **Hypervisor**: qemu-kvm, libvirt, libvirt-daemon-kvm
+- **Management**: virt-manager, virt-install, virt-viewer, virt-top
+- **Networking**: libvirt-daemon-config-network, nmap-ncat
+- **Guest Tools**: guestfs-tools, libguestfs
+- **Remote Access**: remmina, spice-gtk
+- **TPM Emulation**: swtpm
+- **UEFI Support**: edk2-ovmf
+
+### Shell & CLI Tools
+
+- **Shells**: zsh (interactive), dash (system), bash (available)
+- **Terminal Utilities**: bat, btop, htop, fastfetch, fzf, dialog, yad
+- **Editors**: neovim, micro
+- **File Management**: stow, tree, rsync, unzip
+- **Networking**: curl, wget
+- **Monitoring**: lm_sensors
+
+### System Utilities
+
+- **Disk Management**: gnome-disk-utility
+- **Fonts**: Microsoft Core Fonts (Surface variant)
+
+### Flatpaks (Pre-configured)
+
+- Bitwarden, Joplin, Anki, Nextcloud
+- Discord, Zoom
+- Brave, Chrome, Firefox
+- LibreOffice, Flatseal
+- Media players (Jellyfin, Plex)
+
+## Customization
+
+### Fork and Modify
+
+1. **Fork this repository** on GitHub
+2. **Edit package lists** in `recipes/`:
+   - `common-packages.yml` - Core utilities
+   - `common-packages-dev.yml` - Development and virtualization
+   - `common-flatpaks.yml` - Flatpak applications
+3. **Update** `recipe.yml` or `recipe-surface.yml` with your image name
+4. **Push changes** to trigger a build via GitHub Actions
+5. **Rebase** to your custom image:
+   ```bash
+   rpm-ostree rebase ostree-unverified-registry:ghcr.io/YOUR_USERNAME/YOUR_IMAGE:latest
+   ```
+
+### Local Development
+
+Clone and test locally:
+
+```bash
+git clone https://github.com/zoro11031/justin-os.git
+cd justin-os
+```
+
+See [BlueBuild documentation](https://blue-build.org/learn/getting-started/) for local build instructions.
+
+## System Requirements
+
+### Minimum
+
+- **CPU**: x86_64 with virtualization support (Intel VT-x / AMD-V) for libvirt
+- **RAM**: 8 GB (16 GB recommended for running VMs)
+- **Disk**: 30 GB free space
+- **OS**: Fedora Atomic (Silverblue/Kinoite) 39+
+
+### Recommended
+
+- **CPU**: Modern multi-core processor
+- **RAM**: 16 GB or more
+- **Disk**: SSD with 50+ GB free space
+- **Network**: Stable internet connection for initial setup
+
+## Verification
+
+These images are signed with [Sigstore](https://www.sigstore.dev/)'s [cosign](https://github.com/sigstore/cosign).
+
+### Verify Image Signature
+
+Download the public key and verify:
+
+```bash
+cosign verify --key cosign.pub ghcr.io/zoro11031/justin-os:latest
+```
+
+The `cosign.pub` file is available in this repository.
+
+### Manual Signature Check
+
+```bash
+# Download the public key
+curl -O https://raw.githubusercontent.com/zoro11031/justin-os/main/cosign.pub
+
+# Verify the signature
+cosign verify --key cosign.pub ghcr.io/zoro11031/justin-os:latest
+```
+
+## Troubleshooting
+
+### Build Failures
+
+If you encounter build failures related to RPM Fusion:
+
+- The image uses a retry script for downloading RPM Fusion repositories
+- Transient network issues may cause failures; re-run the build
+
+### Flatpak Issues (Surface variant)
+
+If flatpaks fail to install during build:
+
+```bash
+# Run the fallback installation script
+/usr/local/bin/install-surface-flatpaks.sh
+```
+
+### System Shell
+
+The system shell (`/bin/sh`) is set to `dash` for performance. If you encounter script compatibility issues:
+
+- Use `#!/bin/bash` shebang for bash-specific scripts
+- Or run explicitly: `bash script.sh`
+
+See `docs/SYSTEM_SHELL.md` for details.
+
+## ISO Installation
+
+> [!NOTE]  
+> ISO builds are not currently provided via GitHub due to size limitations.
+
+For fresh installations, you can generate a custom ISO following the [Universal Blue ISO creation guide](https://blue-build.org/learn/universal-blue/#fresh-install-from-an-iso).
+
+## Documentation
+
+Additional documentation is available in the `docs/` directory:
+
+- **SYSTEM_SHELL.md**: System shell configuration (dash vs bash)
+- **SURFACE_FLATPAKS.md**: Surface-specific flatpak management
+- **MICROSOFT_FONTS.md**: Microsoft Core Fonts installation details
+
+## Credits
+
+- **[Universal Blue](https://universal-blue.org/)** - Base images and framework
+- **[BlueBuild](https://blue-build.org/)** - Build system and tooling
+- **[Fedora Project](https://fedoraproject.org/)** - Upstream distribution
+- **[uBlue Community](https://github.com/ublue-os)** - Inspiration and support
+
+## License
+
+This project follows the same licensing as Universal Blue and Fedora. See [LICENSE](LICENSE) for details.
+
+---
+
+**Maintainer**: [@zoro11031](https://github.com/zoro11031)  
+**Issues**: [GitHub Issues](https://github.com/zoro11031/justin-os/issues)  
+**Discussions**: [GitHub Discussions](https://github.com/zoro11031/justin-os/discussions)
