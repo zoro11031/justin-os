@@ -58,6 +58,7 @@ modules:
     scripts:
       - set-dash-as-sh.sh
       - set-default-shell-zsh.sh
+      - setup-oh-my-zsh.sh
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
 
