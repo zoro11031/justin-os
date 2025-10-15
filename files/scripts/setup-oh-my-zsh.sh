@@ -43,6 +43,26 @@ if [ ! -d "${OMZ_CUSTOM}/plugins/fast-syntax-highlighting" ]; then
         "${OMZ_CUSTOM}/plugins/fast-syntax-highlighting"
 fi
 
+# Clean up Oh My Zsh installation - remove unused files
+echo "Cleaning up Oh My Zsh installation..."
+
+# Remove unused built-in plugins (we only load a few manually)
+# Keep only: git, docker, kubectl, systemd (commonly used)
+cd "${OMZ_DIR}/plugins" || exit 1
+find . -maxdepth 1 -type d ! -name '.' ! -name 'git' ! -name 'docker' ! -name 'kubectl' ! -name 'systemd' -exec rm -rf {} + 2>/dev/null || true
+
+# Remove unused themes (we use starship)
+cd "${OMZ_DIR}/themes" || exit 1
+find . -type f ! -name 'robbyrussell.zsh-theme' -delete 2>/dev/null || true
+
+# Remove documentation and other non-essential files
+cd "${OMZ_DIR}" || exit 1
+rm -rf .github/ .git/ CONTRIBUTING.md README.md CODE_OF_CONDUCT.md
+
+# Copy custom configs from /usr/share/oh-my-zsh/custom to the installation
+# (These are deployed via BlueBuild's files module)
+echo "Custom config files will be loaded from ${OMZ_CUSTOM}/"
+
 # Set proper permissions
 chmod -R 755 "$OMZ_DIR"
 
@@ -52,4 +72,6 @@ echo "  - zsh-autosuggestions"
 echo "  - zsh-completions"
 echo "  - zsh-autopair"
 echo "  - fast-syntax-highlighting"
+echo ""
+echo "Cleanup complete - removed unused themes and plugins"
 
