@@ -2,7 +2,7 @@ modules:
   - type: files
     files:
       - source: scripts/change-user-shell-zsh.sh
-        destination: /usr/local/bin/change-user-shell-zsh.sh
+        destination: /usr/bin/change-user-shell-zsh.sh
       
       - source: systemd/change-user-shell-zsh.service
         destination: /usr/lib/systemd/system/change-user-shell-zsh.service

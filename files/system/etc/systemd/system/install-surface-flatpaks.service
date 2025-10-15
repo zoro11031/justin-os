@@ -5,7 +5,7 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/install-surface-flatpaks.sh
+ExecStart=/usr/bin/install-surface-flatpaks.sh
 RemainAfterExit=yes
 StandardOutput=journal
 StandardError=journal

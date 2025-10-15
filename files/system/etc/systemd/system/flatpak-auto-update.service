@@ -4,4 +4,4 @@ Documentation=man:flatpak(1)
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/flatpak-auto-update.sh
+ExecStart=/usr/bin/flatpak-auto-update.sh
