@@ -9,6 +9,12 @@ echo "Setting up Oh My Zsh framework..."
 OMZ_DIR="/usr/share/oh-my-zsh"
 OMZ_CUSTOM="${OMZ_DIR}/custom"
 
+# Force reinstall if directory exists but is incomplete
+if [ -d "$OMZ_DIR" ] && [ ! -d "${OMZ_DIR}/plugins" ]; then
+    echo "Incomplete Oh My Zsh installation detected, removing..."
+    rm -rf "$OMZ_DIR"
+fi
+
 if [ ! -d "$OMZ_DIR" ]; then
     echo "Installing Oh My Zsh to ${OMZ_DIR}..."
     git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git "$OMZ_DIR"
@@ -48,16 +54,29 @@ echo "Cleaning up Oh My Zsh installation..."
 
 # Remove unused built-in plugins (we only load a few manually)
 # Keep only: git, docker, kubectl, systemd (commonly used)
-cd "${OMZ_DIR}/plugins" || exit 1
-find . -maxdepth 1 -type d ! -name '.' ! -name 'git' ! -name 'docker' ! -name 'kubectl' ! -name 'systemd' -exec rm -rf {} + 2>/dev/null || true
+if [[ -d "${OMZ_DIR}/plugins" ]]; then
+  cd "${OMZ_DIR}/plugins" || exit 1
+  find . -maxdepth 1 -type d ! -name '.' ! -name 'git' ! -name 'docker' ! -name 'kubectl' ! -name 'systemd' -exec rm -rf {} + 2>/dev/null || true
+  cd - > /dev/null || exit 1
+else
+  echo "Warning: ${OMZ_DIR}/plugins not found, skipping plugin cleanup"
+fi
 
 # Remove unused themes (we use starship)
-cd "${OMZ_DIR}/themes" || exit 1
-find . -type f ! -name 'robbyrussell.zsh-theme' -delete 2>/dev/null || true
+if [[ -d "${OMZ_DIR}/themes" ]]; then
+  cd "${OMZ_DIR}/themes" || exit 1
+  find . -type f ! -name 'robbyrussell.zsh-theme' -delete 2>/dev/null || true
+  cd - > /dev/null || exit 1
+else
+  echo "Warning: ${OMZ_DIR}/themes not found, skipping theme cleanup"
+fi
 
 # Remove documentation and other non-essential files
-cd "${OMZ_DIR}" || exit 1
-rm -rf .github/ .git/ CONTRIBUTING.md README.md CODE_OF_CONDUCT.md
+if [[ -d "${OMZ_DIR}" ]]; then
+  cd "${OMZ_DIR}" || exit 1
+  rm -rf .github/ .git/ CONTRIBUTING.md README.md CODE_OF_CONDUCT.md
+  cd - > /dev/null || exit 1
+fi
 
 # Copy custom configs from /usr/share/oh-my-zsh/custom to the installation
 # (These are deployed via BlueBuild's files module)
