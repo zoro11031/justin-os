@@ -65,7 +65,10 @@ fi
 # Remove unused themes (we use starship)
 if [[ -d "${OMZ_DIR}/themes" ]]; then
   cd "${OMZ_DIR}/themes" || exit 1
+  # Remove all theme files except robbyrussell
   find . -type f ! -name 'robbyrussell.zsh-theme' -delete 2>/dev/null || true
+  # Remove any symlinks pointing to deleted themes
+  find . -type l -delete 2>/dev/null || true
   cd - > /dev/null || exit 1
 else
   echo "Warning: ${OMZ_DIR}/themes not found, skipping theme cleanup"
