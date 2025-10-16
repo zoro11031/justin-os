@@ -47,7 +47,7 @@ help-aliases() {
   if [ -n "$1" ]; then
     echo "Aliases matching '$1':"
     if command -v bat &> /dev/null; then
-      alias | grep -i "$1" | bat --language=bash --style=plain --paging=never
+      alias | grep -i "$1" | bat --language=bash --style=plain --paging=never --color=always
     else
       alias | grep -i "$1"
     fi
@@ -56,7 +56,7 @@ help-aliases() {
   
   # Otherwise show the full help menu
   if command -v bat &> /dev/null; then
-    cat << 'EOF' | bat --language=markdown --style=plain --paging=never
+    cat << 'EOF' | bat --language=markdown --style=plain --paging=never --color=always
 # Common Aliases & Commands
 
 ## Git Shortcuts (from oh-my-zsh git plugin)
