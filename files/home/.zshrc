@@ -260,6 +260,18 @@ export GREP_COLOR='1;32'
 export KEYTIMEOUT=1
 
 # ========================================
+# Bat Configuration (Better cat/less with syntax highlighting)
+# ========================================
+if command -v bat &> /dev/null; then
+  export PAGER="bat --paging=always --style=plain"
+  export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+  export BAT_THEME="ansi"
+  
+  alias cat='bat --paging=never'
+  alias less='bat --paging=always'
+fi
+
+# ========================================
 # Quick Utility Functions
 # ========================================
 # Create and cd into directory
