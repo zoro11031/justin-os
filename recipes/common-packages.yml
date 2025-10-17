@@ -9,6 +9,7 @@ modules:
       - zsh
       - dash # POSIX-compliant system shell
       - util-linux-user # Provides chsh command
+      - libuser # Provides useradd command
       - stow
       - yad
       - neovim
