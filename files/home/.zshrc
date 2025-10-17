@@ -1,16 +1,14 @@
 # ========================================
-# ULTRA-OPTIMIZED ZSHRC
-# Minimal OMZ loading - only what we actually use
+# OPTIMIZED ZSHRC
+# Fast startup with all essential features
 # ========================================
 
 # ========================================
-# Core Performance Settings
+# Path & Environment
 # ========================================
-# Path configuration
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/.npm-global/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
 
-# OMZ path (system-wide or user installation)
+# OMZ path detection
 if [ -d "/usr/share/oh-my-zsh" ]; then
   export ZSH="/usr/share/oh-my-zsh"
 else
@@ -18,126 +16,124 @@ else
 fi
 export ZSH_CACHE_DIR="$ZSH/cache"
 
-# Fast compinit - only check once per day
+# Additional environment
+export WINAPPS_SRC_DIR="$HOME/.local/bin/winapps-src"
+export LESS='-R -X -F'
+export LESSHISTFILE='-'
+export MANPAGER='less -R'
+export GROFF_NO_SGR=1
+export CLICOLOR=1
+export GREP_COLOR='1;32'
+export KEYTIMEOUT=1
+
+# Bat integration (if available) - but NOT for man pages
+if command -v bat &> /dev/null; then
+  export BAT_THEME="ansi"
+  alias cat='bat --paging=never'
+  alias less='bat --paging=always'
+fi
+
+# ========================================
+# Completion System (Fast)
+# ========================================
 autoload -Uz compinit
+# Only rebuild completion cache once per day
 if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qNmh+24) ]]; then
   compinit
 else
   compinit -C
 fi
 
-# ========================================
-# History Configuration (Fish-like)
-# ========================================
-HISTFILE="${ZDOTDIR:-$HOME}/.zsh_history"
-HISTSIZE=50000
-SAVEHIST=50000
-
-setopt EXTENDED_HISTORY          # Write the history file in the ':start:elapsed;command' format
-setopt HIST_EXPIRE_DUPS_FIRST   # Expire duplicate entries first when trimming history
-setopt HIST_IGNORE_ALL_DUPS     # Delete old recorded entry if new entry is a duplicate
-setopt HIST_FIND_NO_DUPS        # Don't display duplicates when searching
-setopt HIST_IGNORE_SPACE        # Don't record an entry starting with a space
-setopt HIST_SAVE_NO_DUPS        # Don't write duplicate entries in the history file
-setopt HIST_REDUCE_BLANKS       # Remove superfluous blanks before recording entry
-setopt HIST_VERIFY              # Don't execute immediately upon history expansion
-setopt INC_APPEND_HISTORY       # Write to the history file immediately, not when the shell exits
-setopt SHARE_HISTORY            # Share history between all sessions
-
-# ========================================
-# Completion Settings (Fish-like)
-# ========================================
-# Case-insensitive completion
+# Completion styling
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-
-# Speed up completion
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path "$ZSH_CACHE_DIR/completions"
 zstyle ':completion:*' accept-exact '*(N)'
 zstyle ':completion:*' squeeze-slashes true
-
-# Better completion menu
 zstyle ':completion:*' menu select
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-
-# Group completions by type
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
-
-# Partial completion suggestions (like Fish)
 zstyle ':completion:*' list-suffixes
 zstyle ':completion:*' expand prefix suffix
-
-# Fuzzy matching for typos
 zstyle ':completion:*' completer _complete _match _approximate
 zstyle ':completion:*:match:*' original only
 zstyle ':completion:*:approximate:*' max-errors 1 numeric
 
 # ========================================
-# Directory Navigation
+# History Configuration
 # ========================================
-setopt AUTO_CD              # If a command is not found but is a directory, cd into it
-setopt AUTO_PUSHD           # Make cd push the old directory onto the directory stack
-setopt PUSHD_IGNORE_DUPS    # Don't push multiple copies of the same directory
-setopt PUSHD_SILENT         # Don't print the directory stack after pushd or popd
-setopt PUSHD_MINUS          # Exchange meanings of +/- when navigating the dir stack
+HISTFILE="${ZDOTDIR:-$HOME}/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+
+setopt EXTENDED_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_FIND_NO_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_SAVE_NO_DUPS
+setopt HIST_REDUCE_BLANKS
+setopt HIST_VERIFY
+setopt INC_APPEND_HISTORY
+setopt SHARE_HISTORY
+
+# ========================================
+# Shell Options
+# ========================================
+# Directory navigation
+setopt AUTO_CD
+setopt AUTO_PUSHD
+setopt PUSHD_IGNORE_DUPS
+setopt PUSHD_SILENT
+setopt PUSHD_MINUS
+
+# Correction & globbing
+setopt CORRECT
+setopt EXTENDED_GLOB
+setopt GLOB_DOTS
+setopt NO_NOMATCH
+
+CORRECT_IGNORE='_*'
+CORRECT_IGNORE_FILE='.*'
 
 # Directory aliases for quick navigation
 alias -g ...='../..'
 alias -g ....='../../..'
 alias -g .....='../../../..'
-alias d='dirs -v | head -10'  # Show last 10 directories
+alias d='dirs -v | head -10'
 
 # ========================================
-# Correction & Globbing
+# Load OMZ Libraries (Essential only)
 # ========================================
-setopt CORRECT              # Command correction
-CORRECT_IGNORE='_*'
-CORRECT_IGNORE_FILE='.*'
-
-# Extended globbing for advanced pattern matching
-setopt EXTENDED_GLOB        # Use extended globbing (#, ~, ^)
-setopt GLOB_DOTS            # Don't require leading '.' in filename to be matched explicitly
-setopt NO_NOMATCH           # Pass through unmatched globs to the command
+source "$ZSH/lib/git.zsh" 2>/dev/null
+source "$ZSH/lib/key-bindings.zsh" 2>/dev/null
+source "$ZSH/lib/completion.zsh" 2>/dev/null
 
 # ========================================
-# Load Essential OMZ Libraries (Minimal)
+# Load Plugins
 # ========================================
-# Only load the libraries we actually need
-source "$ZSH/lib/git.zsh"           # Git functions for prompt/aliases
-source "$ZSH/lib/key-bindings.zsh"  # Essential key bindings
-source "$ZSH/lib/completion.zsh"    # Completion enhancements
-
-# ========================================
-# Load Core Plugins Directly
-# ========================================
-# Git plugin
+# Core plugins
 [[ -f "$ZSH/plugins/git/git.plugin.zsh" ]] && source "$ZSH/plugins/git/git.plugin.zsh"
-
-# Z - directory jumping
 [[ -f "$ZSH/plugins/z/z.plugin.zsh" ]] && source "$ZSH/plugins/z/z.plugin.zsh"
-
-# Sudo plugin
 [[ -f "$ZSH/plugins/sudo/sudo.plugin.zsh" ]] && source "$ZSH/plugins/sudo/sudo.plugin.zsh"
 
-# Zsh-completions (if installed)
-if [[ -d "$ZSH/custom/plugins/zsh-completions" ]]; then
+# Completions
+[[ -d "$ZSH/custom/plugins/zsh-completions" ]] && \
   fpath=("$ZSH/custom/plugins/zsh-completions/src" $fpath)
-fi
 
 # History substring search
 if [[ -f "$ZSH/plugins/history-substring-search/history-substring-search.zsh" ]]; then
   source "$ZSH/plugins/history-substring-search/history-substring-search.zsh"
-  # Bind keys
   bindkey '^[[A' history-substring-search-up
   bindkey '^[[B' history-substring-search-down
 fi
 
-# Zsh-autopair
+# Autopair
 [[ -f "$ZSH/custom/plugins/zsh-autopair/zsh-autopair.plugin.zsh" ]] && \
   source "$ZSH/custom/plugins/zsh-autopair/zsh-autopair.plugin.zsh"
 
-# Zsh-autosuggestions (async for performance)
+# Autosuggestions (async)
 if [[ -f "$ZSH/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
   ZSH_AUTOSUGGEST_STRATEGY=(history completion)
   ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
@@ -146,157 +142,96 @@ if [[ -f "$ZSH/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; t
   source "$ZSH/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
 fi
 
-# Fast-syntax-highlighting (load LAST for best performance)
+# Syntax highlighting (load last)
 [[ -f "$ZSH/custom/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh" ]] && \
   source "$ZSH/custom/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
 
 # ========================================
 # FZF Integration
 # ========================================
-export FZF_BASE=/usr/share/fzf
 if [[ -f /usr/share/fzf/key-bindings.zsh ]]; then
+  export FZF_BASE=/usr/share/fzf
   source /usr/share/fzf/key-bindings.zsh
   source /usr/share/fzf/completion.zsh
 fi
 
 # ========================================
-# Lazy-loaded plugins for better performance
+# Command-not-found handler
 # ========================================
-
-# Lazy load colored-man-pages (only when viewing man pages)
-unalias man 2>/dev/null
-function man() {
-  # Load colored-man-pages plugin on first use
-  if ! typeset -f _colorman > /dev/null; then
-    if [[ -f $ZSH/plugins/colored-man-pages/colored-man-pages.plugin.zsh ]]; then
-      source $ZSH/plugins/colored-man-pages/colored-man-pages.plugin.zsh
-    fi
-  fi
-  # Call the actual man command
-  command man "$@"
-}
-
-# Lazy load command-not-found (only when command fails)
 if [[ -f /etc/zsh_command_not_found ]]; then
   command_not_found_handler() {
     if [[ -x /usr/lib/command-not-found ]]; then
       /usr/lib/command-not-found -- "$1"
-      return $?
     elif [[ -x /usr/share/command-not-found/command-not-found ]]; then
       /usr/share/command-not-found/command-not-found -- "$1"
-      return $?
     else
       printf "zsh: command not found: %s\n" "$1" >&2
-      return 127
     fi
+    return 127
   }
-fi
-
-# Lazy load alias-finder (only when explicitly called)
-alias-finder() {
-  if [[ ! -f $ZSH/plugins/alias-finder/alias-finder.plugin.zsh ]]; then
-    echo "alias-finder plugin not found"
-    return 1
-  fi
-  # Load the plugin on first use
-  if ! typeset -f _alias-finder > /dev/null; then
-    source $ZSH/plugins/alias-finder/alias-finder.plugin.zsh
-  fi
-  # Call the actual function
-  _alias-finder "$@"
-}
-
-# Lazy load zsh-interactive-cd (only when cd is used with no args in certain contexts)
-if [[ -f $ZSH/plugins/zsh-interactive-cd/zsh-interactive-cd.plugin.zsh ]]; then
-  _lazy_load_interactive_cd() {
-    unfunction _lazy_load_interactive_cd
-    source $ZSH/plugins/zsh-interactive-cd/zsh-interactive-cd.plugin.zsh
-  }
-  # Bind to Ctrl+X Ctrl+F for interactive cd (loads plugin on first use)
-  bindkey -s '^X^F' '^Q_lazy_load_interactive_cd\n'
 fi
 
 # ========================================
-# Starship Prompt (Fast alternative to OMZ themes)
+# Prompt (Starship or fallback)
 # ========================================
 if command -v starship &> /dev/null; then
   eval "$(starship init zsh)"
+elif [[ -f $ZSH/themes/robbyrussell.zsh-theme ]]; then
+  source $ZSH/themes/robbyrussell.zsh-theme
 else
-  # Fallback to robbyrussell theme if starship not found
-  if [[ -f $ZSH/themes/robbyrussell.zsh-theme ]]; then
-    source $ZSH/themes/robbyrussell.zsh-theme
-  else
-    # Ultimate fallback: simple prompt with cwd
-    PROMPT='%F{cyan}%~%f %F{green}❯%f '
-  fi
+  PROMPT='%F{cyan}%~%f %F{green}❯%f '
 fi
 
 # ========================================
-# Load Custom Configuration Files
+# Core Utility Functions
 # ========================================
-# Load custom configs from $ZSH/custom/*.zsh (excluding example.zsh)
-for config_file ($ZSH/custom/*.zsh~$ZSH/custom/example.zsh(N)); do
-  source $config_file
-done
-unset config_file
 
-# ========================================
-# Additional Environment Variables
-# ========================================
-export WINAPPS_SRC_DIR="$HOME/.local/bin/winapps-src"
-
-# Better less defaults
-export LESS='-F -g -i -M -R -S -w -X -z-4'
-export LESSHISTFILE='-'  # Disable less history file
-
-# Colorized output for common commands
-export CLICOLOR=1
-export GREP_COLOR='1;32'
-
-# ========================================
-# Performance: Reduce escape sequence timeout
-# ========================================
-# Makes key combinations faster (especially ESC)
-export KEYTIMEOUT=1
-
-# ========================================
-# Bat Configuration (Better cat/less with syntax highlighting)
-# ========================================
-if command -v bat &> /dev/null; then
-  export PAGER="bat --paging=always --style=plain"
-  export MANPAGER="sh -c 'col -bx | bat -l man -p'"
-  export BAT_THEME="ansi"
-  
-  alias cat='bat --paging=never'
-  alias less='bat --paging=always'
-fi
-
-# ========================================
-# Quick Utility Functions
-# ========================================
-# Create and cd into directory
+# Create directory and cd into it
+unalias mkcd 2>/dev/null
 mkcd() {
+  [[ -z "$1" ]] && { echo "Usage: mkcd <directory>"; return 1; }
   mkdir -p "$1" && cd "$1"
 }
 
-# Extract any archive
-extract() {
-  if [ -f "$1" ]; then
-    case "$1" in
-      *.tar.bz2)   tar xjf "$1"    ;;
-      *.tar.gz)    tar xzf "$1"    ;;
-      *.bz2)       bunzip2 "$1"    ;;
-      *.rar)       unrar x "$1"    ;;
-      *.gz)        gunzip "$1"     ;;
-      *.tar)       tar xf "$1"     ;;
-      *.tbz2)      tar xjf "$1"    ;;
-      *.tgz)       tar xzf "$1"    ;;
-      *.zip)       unzip "$1"      ;;
-      *.Z)         uncompress "$1" ;;
-      *.7z)        7z x "$1"       ;;
-      *)           echo "'$1' cannot be extracted via extract()" ;;
-    esac
-  else
-    echo "'$1' is not a valid file"
+# Find files by name (case-insensitive)
+unalias ff 2>/dev/null
+ff() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: ff <pattern>"
+    echo "Example: ff .zshrc"
+    echo "         ff '*.py'"
+    return 1
   fi
+  find . -iname "*$1*" 2>/dev/null
 }
+
+# Extract any archive format
+unalias extract 2>/dev/null
+extract() {
+  if [[ ! -f "$1" ]]; then
+    echo "Error: '$1' is not a valid file"
+    return 1
+  fi
+  
+  case "$1" in
+    *.tar.bz2|*.tbz2) tar xjf "$1" ;;
+    *.tar.gz|*.tgz)   tar xzf "$1" ;;
+    *.tar.xz)         tar xJf "$1" ;;
+    *.tar)            tar xf "$1" ;;
+    *.bz2)            bunzip2 "$1" ;;
+    *.gz)             gunzip "$1" ;;
+    *.zip)            unzip "$1" ;;
+    *.rar)            unrar x "$1" ;;
+    *.7z)             7z x "$1" ;;
+    *.Z)              uncompress "$1" ;;
+    *)                echo "Error: '$1' cannot be extracted via extract()"; return 1 ;;
+  esac
+}
+
+# ========================================
+# Load Custom Configs
+# ========================================
+for config_file in $ZSH/custom/*.zsh(N); do
+  [[ $(basename "$config_file") != "example.zsh" ]] && source "$config_file"
+done
+unset config_file
