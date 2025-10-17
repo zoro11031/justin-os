@@ -1,22 +1,21 @@
 #!/bin/bash
-# Set zsh as the default shell in /etc/passwd for new users
-# This makes $SHELL return /usr/bin/zsh
+# Auto-launch zsh from bashrc for interactive shells
+# This makes bash automatically exec into zsh without changing the default shell
 
 set -euo pipefail
 
-echo "Setting zsh as default shell..."
+echo "Configuring bashrc to auto-launch zsh..."
 
-# Change the default shell in useradd defaults
-if [ -f /etc/default/useradd ]; then
-    sed -i 's|^SHELL=.*|SHELL=/usr/bin/zsh|' /etc/default/useradd
-    echo "Updated /etc/default/useradd to use zsh"
+# Add zsh exec to /etc/bashrc for all users
+if ! grep -q "exec /usr/bin/zsh" /etc/bashrc 2>/dev/null; then
+    cat >> /etc/bashrc << 'EOF'
+
+# Auto-launch zsh for interactive shells
+[ ! -z "$PS1" ] && exec /usr/bin/zsh
+EOF
+    echo "Added zsh auto-launch to /etc/bashrc"
+else
+    echo "zsh auto-launch already configured in /etc/bashrc"
 fi
 
-# Also set it in /etc/adduser.conf if it exists (Debian-style)
-if [ -f /etc/adduser.conf ]; then
-    sed -i 's|^DSHELL=.*|DSHELL=/usr/bin/zsh|' /etc/adduser.conf
-    echo "Updated /etc/adduser.conf to use zsh"
-fi
-
-echo "Default shell set to zsh for new users"
-echo "Existing users can run: chsh -s /usr/bin/zsh"
+echo "Bash will now automatically launch zsh for interactive sessions"
