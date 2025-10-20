@@ -1,8 +1,7 @@
 modules:
   - type: rpm-ostree
     repos:
-      copr:
-        - scottames/ghostty
+      - https://copr.fedorainfracloud.org/coprs/scottames/ghostty/repo/fedora-%OS_VERSION%/scottames-ghostty-fedora-%OS_VERSION%.repo
     install:
       # Shell & Terminal
       - bat
