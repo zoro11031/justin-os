@@ -1,5 +1,8 @@
 modules:
   - type: rpm-ostree
+    repos:
+      copr:
+        - scottames/ghostty
     install:
       # Shell & Terminal
       - bat
@@ -14,6 +17,7 @@ modules:
       - yad
       - neovim
       - fzf
+      - ghostty
 
       # GUI
       - gnome-disk-utility
