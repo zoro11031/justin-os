@@ -190,10 +190,11 @@ No system shell change (keeps bash as `/bin/sh` to avoid build issues).
 Want to customize it? Fork the repo and:
 
 1. **Edit package lists** in `recipes/`:
-   - `common-packages.yml` - core system utilities
-   - `common-packages-dev.yml` - development tools
-   - `common-flatpaks.yml` - flatpak applications
-   - `common-systemd.yml` - enabled services
+   - `packages.yml` - core system packages, development tools, and services
+   - `packages-surface.yml` - Surface variant packages
+   - `common-flatpaks.yml` - flatpak applications (both builds)
+   - `surface-flatpaks.yml` - Surface-specific flatpaks
+   - `system-services.yml` - systemd services (VPN fix, dash shell)
 2. **Update image name** in `recipe.yml` (change `name:` field)
 3. **Push to GitHub** - Actions will automatically build your image
 4. **Rebase to your custom image** using the installation instructions above
@@ -201,10 +202,19 @@ Want to customize it? Fork the repo and:
 ### Recipe Files
 
 - **recipe.yml** - Main KDE build configuration
-- **recipe-surface.yml** - Surface variant with GNOME and Surface kernel
-- **common-*.yml** - Shared modules used by both builds
-- **vpn-fix.yml** - SELinux fix for OpenVPN certificates
-- **dash-shell.yml** - Dash shell configuration (main build only)
+- **recipe-surface.yml** - Surface variant with GNOME and linux-surface kernel
+- **packages.yml** - Core system packages, development tools, and enabled services
+- **packages-surface.yml** - Lighter package set for Surface variant
+- **system-services.yml** - VPN SELinux fix and dash shell services
+- **common-flatpaks.yml** - Shared flatpak applications
+- **surface-flatpaks.yml** - Surface-specific flatpak applications
+
+### Helper Scripts
+
+Optional scripts are available in `~/Documents/justin-os-scripts/`:
+- `install-common-flatpaks.sh` - Manually install all common flatpaks
+- `install-surface-flatpaks.sh` - Manually install Surface flatpaks
+- `flatpak-auto-update.sh` - Update all flatpaks
 
 Check out the [BlueBuild docs](https://blue-build.org/learn/getting-started/) for more details on customization.
 
@@ -280,20 +290,23 @@ See `docs/` folder for more troubleshooting guides.
 
 Additional documentation is available in the `docs/` folder:
 
-- **FLATPAK_MANAGEMENT.md** - How flatpak auto-installation and updates work
+- **FLATPAK_MANAGEMENT.md** - Flatpak installation and management
 - **SYSTEM_SHELL.md** - Dash vs bash system shell differences
 - **SURFACE_FLATPAKS.md** - Surface-specific flatpak applications
 - **MICROSOFT_FONTS.md** - Microsoft Core Fonts installation (Surface build)
 
+Helper scripts are included in `~/Documents/justin-os-scripts/` for optional manual flatpak management.
+
 ## Features
 
-✅ **Zsh by default** - System-wide default shell with optimized Oh My Zsh configuration  
+✅ **Zsh by default** - Optimized Oh My Zsh with fast startup (~100-200ms)  
 ✅ **Extensive flatpaks** - Productivity, development, and entertainment apps included  
-✅ **Modern CLI tools** - bat, btop, fzf, neovim, starship, ghostty  
-✅ **Development ready** - Go, Python, Docker, libvirt  
+✅ **Modern CLI tools** - bat, btop, fzf, neovim, starship, ghostty terminal  
+✅ **Development ready** - Go, Python, Docker, libvirt with services enabled  
 ✅ **Signed images** - Cryptographically signed with cosign  
 ✅ **Surface optimized** - Dedicated build with linux-surface kernel  
-✅ **RPM Fusion enabled** - Free and nonfree repos ready to use
+✅ **RPM Fusion enabled** - Free and nonfree repos ready to use  
+✅ **Consolidated recipes** - Clean, readable configuration structure
 
 ## Credits
 
