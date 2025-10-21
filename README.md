@@ -173,6 +173,10 @@ Flatpaks are installed via the default-flatpaks module during the image build. I
 - Gear Lever (AppImage manager)
 - GNOME Calculator
 
+### Common Features (Both Builds)
+
+- **Fonts**: Microsoft Core Fonts (Arial, Times New Roman, Courier New, etc.)
+
 ### Surface Build Additions
 
 The `justin-os-surface` variant includes:
@@ -181,7 +185,6 @@ The `justin-os-surface` variant includes:
 - **Touchscreen**: iptsd (touchscreen firmware)
 - **Hardware**: libwacom-surface, thermald
 - **Security**: surface-secureboot certificate
-- **Fonts**: Microsoft Core Fonts (Arial, Times New Roman, etc.)
 
 No system shell change (keeps bash as `/bin/sh` to avoid build issues).
 
@@ -293,7 +296,7 @@ Additional documentation is available in the `docs/` folder:
 - **FLATPAK_MANAGEMENT.md** - Flatpak installation and management
 - **SYSTEM_SHELL.md** - Dash vs bash system shell differences
 - **SURFACE_FLATPAKS.md** - Surface-specific flatpak applications
-- **MICROSOFT_FONTS.md** - Microsoft Core Fonts installation (Surface build)
+- **MICROSOFT_FONTS.md** - Microsoft Core Fonts installation (both builds)
 
 Helper scripts are included in `~/Documents/justin-os-scripts/` for optional manual flatpak management.
 

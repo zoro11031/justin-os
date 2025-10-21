@@ -11,13 +11,13 @@ modules:
       - fastfetch
       - zsh
       - dash # POSIX-compliant system shell that is up to 4x faster than bash
-      - util-linux-user # Provides chsh command
-      - libuser # Provides useradd command
+      - util-linux-user 
+      - libuser
       - stow
       - yad
       - neovim
-      - fzf
-      - ghostty
+      - fzf # Fuzzy finder
+      - ghostty # Terminal emulator with enhanced features written in zig
 
       # GUI
       - gnome-disk-utility
