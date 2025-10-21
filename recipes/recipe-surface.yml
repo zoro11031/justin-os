@@ -9,18 +9,34 @@ modules:
     repos:
       - https://pkg.surfacelinux.com/fedora/linux-surface.repo
 
-  # Import all your existing modules
-  - from-file: common-repos.yml
-  - from-file: common-packages-surface.yml
-  - from-file: surface-flatpaks.yml
-
-  # Copy system files (systemd services) and scripts
+  # Copy system files and home directory templates
   - type: files
     files:
+      - source: home
+        destination: /var/home
       - source: system
         destination: /
-      - source: scripts/install-surface-flatpaks.sh
-        destination: /usr/bin/install-surface-flatpaks.sh
+
+  # Install RPM Fusion repositories
+  - type: script
+    scripts:
+      - install-rpmfusion.sh
+
+  # Import shared modules
+  - from-file: packages-surface.yml
+  - from-file: surface-flatpaks.yml
+
+  # VPN SELinux fix (no dash shell service for Surface)
+  - type: rpm-ostree
+    install:
+      - policycoreutils-python-utils
+
+  - type: files
+    files:
+      - source: scripts/fix-vpn-selinux.sh
+        destination: /usr/bin/fix-vpn-selinux.sh
+      - source: systemd/fix-vpn-selinux.service
+        destination: /usr/lib/systemd/system/fix-vpn-selinux.service
 
   # Microsoft fonts dependencies and installer
   - type: rpm-ostree
@@ -61,6 +77,6 @@ modules:
     system:
       enabled:
         - thermald.service
-        - install-surface-flatpaks.service
+        - fix-vpn-selinux.service
 
   - type: signing

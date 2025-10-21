@@ -1,5 +1,0 @@
-modules:
-  # Install RPM Fusion with retry logic via script
-  - type: script
-    scripts:
-      - install-rpmfusion.sh

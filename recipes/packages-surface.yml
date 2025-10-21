@@ -1,4 +1,5 @@
 modules:
+  # Surface variant packages (lighter set without dash shell)
   - type: rpm-ostree
     install:
       # Shell & Terminal
@@ -10,7 +11,7 @@ modules:
 
       # System utilities
       - lm_sensors # Hardware monitoring
-      - htop # Process viewer (or stick with btop)
+      - htop # Process viewer
       - rsync # File synchronization
       - tree # Directory tree viewer
       - unzip # Archive extraction

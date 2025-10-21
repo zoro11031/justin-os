@@ -1,7 +1,0 @@
-[Unit]
-Description=Weekly Flatpak auto-update
-Documentation=man:flatpak(1)
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/flatpak-auto-update.sh

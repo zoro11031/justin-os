@@ -12,15 +12,20 @@ image-version: 42 # latest is also supported if you want new updates ASAP
 # module configuration, executed in order
 # you can include multiple instances of the same module
 modules:
+  # Copy system files and home directory templates
   - type: files
     files:
+      - source: home
+        destination: /var/home # User home directory templates
       - source: system
-        destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
-      - source: scripts/install-common-flatpaks.sh
-        destination: /usr/bin/install-common-flatpaks.sh
-      - source: scripts/flatpak-auto-update.sh
-        destination: /usr/bin/flatpak-auto-update.sh
+        destination: / # System files and configurations
 
+  # Install RPM Fusion repositories
+  - type: script
+    scripts:
+      - install-rpmfusion.sh
+
+  # DNF packages with COPR repos
   - type: dnf
     repos:
       copr:
@@ -31,26 +36,21 @@ modules:
         - starship
     remove:
       packages:
-        # example: removing firefox (in favor of the flatpak)
-        # "firefox" is the main package, "firefox-langpacks" is a dependency
         - firefox
-        - firefox-langpacks # also remove firefox dependency (not required for all packages, this is a special case)
+        - firefox-langpacks
+
+  # Default flatpaks
   - type: default-flatpaks
     configurations:
-      - notify: true # Send notification after install/uninstall is finished (true/false)
+      - notify: true
         scope: system
-        # If no repo information is specified, Flathub will be used by default
-        install: # system flatpaks we want all users to have and not remove
+        install:
           - org.gnome.Loupe
-      - scope: user # Also add Flathub user repo, but no user packages
+      - scope: user
 
-  # Import all the modular pieces
-  - from-file: common-repos.yml
-  - from-file: common-packages.yml
-  - from-file: common-packages-dev.yml
-  - from-file: common-systemd.yml
-  - from-file: vpn-fix.yml
-  - from-file: files.yml
+  # Import consolidated modules
+  - from-file: packages.yml
+  - from-file: system-services.yml
   - from-file: common-flatpaks.yml
 
   # Configure shells and zsh (BEFORE changing /bin/sh)
@@ -59,7 +59,7 @@ modules:
       - set-default-shell-zsh.sh
       - setup-oh-my-zsh.sh
 
-  - type: signing # this sets up the proper policy & signing files for signed images to work fully
+  - type: signing
 
   # Change /bin/sh to dash (MUST BE LAST - after all package operations)
   - type: script

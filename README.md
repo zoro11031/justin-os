@@ -31,7 +31,7 @@ Go, Python, micro editor, and starship prompt. Docker and libvirt for containers
 RPM Fusion (free and nonfree) pre-configured. Surface variant adds linux-surface repo.
 
 **Flatpaks**  
-Extensive collection of applications that install automatically on first boot via systemd service. Weekly auto-updates keep everything current without manual intervention.
+Extensive collection of applications available via the default-flatpaks module during image build. Optional installation scripts are provided in `~/Documents/justin-os-scripts/` if manual installation is needed.
 
 **Surface Extras (surface variant only)**  
 Linux-surface kernel for better hardware support, touchscreen firmware (iptsd), thermald for thermal management, and Surface SecureBoot certificate.
@@ -121,11 +121,9 @@ rpm-ostree status
 
 - **System**: gnome-disk-utility
 
-### Flatpaks (Auto-installed on first boot)
+### Flatpaks
 
-**Note:** Flatpaks install automatically on first boot via systemd service. The installation only runs once per deployment, so it won't slow down subsequent boots. Weekly auto-updates keep apps current.
-
-(They should install during the image build using the default-flatpaks module, but I've found it to be unreliable, so first-boot installation is more consistent.)
+Flatpaks are installed via the default-flatpaks module during the image build. If installation fails or you need to reinstall them, optional scripts are available in `~/Documents/justin-os-scripts/`.
 
 #### Productivity & Office
 - Bitwarden (password manager)
@@ -238,24 +236,19 @@ The `cosign.pub` file is in this repo.
 
 ## Troubleshooting
 
-### Flatpaks won't install on first boot
+### Flatpaks didn't install during build
 
-Check the service status:
+If flatpaks are missing after installation, you can manually install them using the provided scripts:
+
 ```bash
-systemctl status install-common-flatpaks.service
+cd ~/Documents/justin-os-scripts/
+bash install-common-flatpaks.sh
 ```
 
-View the service logs:
+For the Surface variant:
 ```bash
-journalctl -u install-common-flatpaks.service
+bash install-surface-flatpaks.sh
 ```
-
-Run manually if needed:
-```bash
-sudo /usr/bin/install-common-flatpaks.sh
-```
-
-The service uses a stamp file (`/var/lib/justin-os/common-flatpaks-installed`) to track completion. It only runs once per deployment.
 
 ### System shell compatibility (main build only)
 
@@ -295,8 +288,8 @@ Additional documentation is available in the `docs/` folder:
 ## Features
 
 ✅ **Zsh by default** - System-wide default shell with optimized Oh My Zsh configuration  
-✅ **Zero maintenance flatpaks** - Install once, auto-update weekly  
-✅ **Modern CLI tools** - bat, btop, fzf, neovim, starship  
+✅ **Extensive flatpaks** - Productivity, development, and entertainment apps included  
+✅ **Modern CLI tools** - bat, btop, fzf, neovim, starship, ghostty  
 ✅ **Development ready** - Go, Python, Docker, libvirt  
 ✅ **Signed images** - Cryptographically signed with cosign  
 ✅ **Surface optimized** - Dedicated build with linux-surface kernel  

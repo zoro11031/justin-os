@@ -1,0 +1,73 @@
+modules:
+  # Core system packages and utilities
+  - type: rpm-ostree
+    repos:
+      - https://copr.fedorainfracloud.org/coprs/scottames/ghostty/repo/fedora-%OS_VERSION%/scottames-ghostty-fedora-%OS_VERSION%.repo
+    install:
+      # Shell & Terminal
+      - bat
+      - btop
+      - dialog
+      - fastfetch
+      - zsh
+      - dash # POSIX-compliant system shell
+      - util-linux-user # Provides chsh command
+      - libuser # Provides useradd command
+      - stow
+      - yad
+      - neovim
+      - fzf
+      - ghostty
+
+      # GUI
+      - gnome-disk-utility
+
+      # System utilities
+      - lm_sensors # Hardware monitoring
+      - htop # Process viewer
+      - rsync # File synchronization
+      - tree # Directory tree viewer
+      - unzip # Archive extraction
+      - curl # HTTP client
+      - wget # File downloader
+      - jq # JSON processor
+
+  # Development tools and virtualization
+  - type: rpm-ostree
+    install:
+      # Virtualization
+      - guestfs-tools
+      - libvirt
+      - libvirt-daemon-config-network
+      - libvirt-daemon-kvm
+      - nmap-ncat
+      - qemu-kvm
+      - remmina
+      - spice-gtk
+      - swtpm
+      - virt-install
+      - virt-manager
+      - virt-top
+      - virt-viewer
+      - edk2-ovmf
+      
+      # Development
+      - git
+      - go
+      - gopls
+      - nodejs-bash-language-server
+      - npm
+      - pip
+      - ShellCheck
+      - docker
+      - docker-compose
+      - python3
+      - libguestfs
+      - shfmt
+
+  # Enable virtualization and container services
+  - type: systemd
+    system:
+      enabled:
+        - docker.service
+        - libvirtd.service
