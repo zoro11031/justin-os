@@ -232,7 +232,7 @@ Check out the [BlueBuild docs](https://blue-build.org/learn/getting-started/) fo
 
 **Software:**
 - Existing Fedora Atomic installation (Silverblue, Kinoite, or any Universal Blue variant)
-- Fedora 42 or compatible version
+- Fedora 43 or compatible version
 
 **For Surface variant:**
 - Microsoft Surface device (tested on Surface Pro 7)

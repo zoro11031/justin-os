@@ -11,22 +11,22 @@ cd "${TEMP_DIR}"
 
 echo "Downloading RPM Fusion Free repository..."
 if ! curl -L -f --retry 3 --retry-delay 5 --max-time 180 \
-  -o rpmfusion-free-release-42.noarch.rpm \
-  https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-42.noarch.rpm; then
+  -o rpmfusion-free-release-43.noarch.rpm \
+  https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-43.noarch.rpm; then
   echo "ERROR: Failed to download RPM Fusion Free repository" >&2
   exit ${E_DOWNLOAD}
 fi
 
 echo "Downloading RPM Fusion Nonfree repository..."
 if ! curl -L -f --retry 3 --retry-delay 5 --max-time 180 \
-  -o rpmfusion-nonfree-release-42.noarch.rpm \
-  https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-42.noarch.rpm; then
+  -o rpmfusion-nonfree-release-43.noarch.rpm \
+  https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-43.noarch.rpm; then
   echo "ERROR: Failed to download RPM Fusion Nonfree repository" >&2
   exit ${E_DOWNLOAD}
 fi
 
 echo "Installing RPM Fusion repositories..."
-rpm -ivh rpmfusion-free-release-42.noarch.rpm rpmfusion-nonfree-release-42.noarch.rpm
+rpm -ivh rpmfusion-free-release-43.noarch.rpm rpmfusion-nonfree-release-43.noarch.rpm
 
 echo "RPM Fusion repositories installed successfully!"
 exit 0
