@@ -21,9 +21,10 @@ modules:
         destination: / # System files and configurations
 
   # Install RPM Fusion repositories
-  - type: script
-    scripts:
-      - install-rpmfusion.sh
+  - type: rpm-ostree
+    install:
+      - https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-%OS_VERSION%.noarch.rpm
+      - https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-%OS_VERSION%.noarch.rpm
 
   # DNF packages
   - type: dnf
