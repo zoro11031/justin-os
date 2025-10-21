@@ -1,8 +1,0 @@
-modules:
-  - type: systemd
-    system:
-      enabled:
-        - docker.service
-        - libvirtd.service
-        - install-common-flatpaks.service
-        - flatpak-auto-update.timer
