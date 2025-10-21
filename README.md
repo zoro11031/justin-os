@@ -182,6 +182,7 @@ Flatpaks are installed via the default-flatpaks module during the image build. I
 
 The `justin-os-surface` variant includes:
 
+- **Base**: Fedora 42 (until linux-surface adds F43 support)
 - **Kernel**: kernel-surface, kernel-surface-default-watchdog
 - **Touchscreen**: iptsd (touchscreen firmware)
 - **Hardware**: libwacom-surface, thermald
@@ -232,7 +233,7 @@ Check out the [BlueBuild docs](https://blue-build.org/learn/getting-started/) fo
 
 **Software:**
 - Existing Fedora Atomic installation (Silverblue, Kinoite, or any Universal Blue variant)
-- Fedora 43 or compatible version
+- Fedora 43 (main build) or Fedora 42 (Surface build)
 
 **For Surface variant:**
 - Microsoft Surface device (tested on Surface Pro 7)
