@@ -10,7 +10,7 @@ modules:
       - dialog
       - fastfetch
       - zsh
-      - dash # POSIX-compliant system shell
+      - dash # POSIX-compliant system shell that is up to 4x faster than bash
       - util-linux-user # Provides chsh command
       - libuser # Provides useradd command
       - stow
