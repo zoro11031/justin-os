@@ -1,7 +1,7 @@
 name: justin-os-surface
 description: Surface Pro 7 variant with KDE and linux-surface kernel
 base-image: ghcr.io/ublue-os/silverblue-main
-image-version: 42
+image-version: 43
 
 modules:
   # Add linux-surface repo FIRST
