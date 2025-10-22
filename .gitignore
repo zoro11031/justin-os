@@ -1,3 +1,79 @@
+# Signing keys
 cosign.key
 cosign.private
+
+# Container files
 /Containerfile
+
+# WinApps sensitive configuration files
+files/home/.config/winapps/winapps.conf
+files/home/.config/winapps/compose.yaml
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.template
+*.local
+
+# Credentials and secrets
+*secret*
+*credentials*
+*password*
+*.key
+*.pem
+*.p12
+*.pfx
+*.cer
+*.crt
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+
+# SSH and GPG
+.ssh/
+*.gpg
+
+# API keys and tokens
+*apikey*
+*api_key*
+*token*
+*oauth*
+
+# Cloud provider credentials
+.aws/
+.gcp/
+.azure/
+credentials.json
+service-account*.json
+
+# Database credentials
+*.db-journal
+*.sql.bak
+
+# Backup files that might contain sensitive data
+*.bak
+*.backup
+*.old
+*.orig
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs that might contain sensitive data
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
