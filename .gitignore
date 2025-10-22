@@ -6,8 +6,11 @@ cosign.private
 /Containerfile
 
 # WinApps sensitive configuration files
-files/home/.config/winapps/winapps.conf
-files/home/.config/winapps/compose.yaml
+# NOTE: The config files ARE tracked with safe placeholder values for builds
+# The .template files serve as backups. Users should modify the tracked files locally
+# and ensure they don't commit real credentials (check before git add!)
+files/home/.config/winapps/*.bak
+files/home/.config/winapps/*.bak.bak
 
 # Environment files
 .env
