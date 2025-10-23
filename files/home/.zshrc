@@ -143,8 +143,34 @@ zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|
 # Command previews (show help/man)
 # Optional: install 'tldr' for simplified command examples (https://tldr.sh)
 # Fallback chain: tldr -> man -> which -> variable expansion
-zstyle ':fzf-tab:complete:-command-:*' fzf-preview '(out=$(tldr --color always "$word") 2>/dev/null && echo $out) || (out=$(man "$word") 2>/dev/null && echo $out) || (out=$(which "$word") 2>/dev/null && echo $out) || echo "${(P)word}"'
 
+# Function for command preview fallback chain
+fzf_command_preview() {
+  local cmd="$1"
+  # Try tldr
+  if command -v tldr &>/dev/null; then
+    local out
+    out=$(tldr --color always "$cmd" 2>/dev/null)
+    if [[ -n "$out" ]]; then
+      echo "$out"
+      return
+    fi
+  fi
+  # Try man
+  if man "$cmd" &>/dev/null; then
+    man "$cmd"
+    return
+  fi
+  # Try which
+  if which "$cmd" &>/dev/null; then
+    which "$cmd"
+    return
+  fi
+  # Variable expansion fallback
+  echo "${(P)cmd}"
+}
+
+zstyle ':fzf-tab:complete:-command-:*' fzf-preview 'fzf_command_preview "$word"'
 # Generic file previews (with bat/cat fallback) - placed last to avoid overriding specific configs
 zstyle ':fzf-tab:complete:*:*' fzf-preview 'if [[ -f $realpath ]]; then
   if command -v bat &> /dev/null; then
