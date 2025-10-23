@@ -114,20 +114,13 @@ zstyle ':completion:*:approximate:*' max-errors 1 numeric
 zstyle ':completion:*' menu no
 
 # fzf-tab preview configurations
+# Global preview window settings (must come before specific configs)
+zstyle ':fzf-tab:*' fzf-flags '--height=80%' '--preview-window=right:50%:wrap'
+zstyle ':fzf-tab:*' fzf-pad 4
+
 # Directory previews
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
-
-# File previews (with bat/cat fallback)
-zstyle ':fzf-tab:complete:*:*' fzf-preview 'if [[ -f $realpath ]]; then
-  if command -v bat &> /dev/null; then
-    bat --color=always --style=numbers --line-range=:500 $realpath 2>/dev/null
-  else
-    cat $realpath 2>/dev/null | head -500
-  fi
-elif [[ -d $realpath ]]; then
-  ls --color=always $realpath
-fi'
 
 # Git previews
 zstyle ':fzf-tab:complete:git-(add|diff|restore):*' fzf-preview 'git diff $word | delta 2>/dev/null || git diff $word'
@@ -149,9 +142,16 @@ zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|
 # Command previews (show help/man)
 zstyle ':fzf-tab:complete:-command-:*' fzf-preview '(out=$(tldr --color always "$word") 2>/dev/null && echo $out) || (out=$(man "$word") 2>/dev/null && echo $out) || (out=$(which "$word") 2>/dev/null && echo $out) || echo "${(P)word}"'
 
-# Preview window settings
-zstyle ':fzf-tab:*' fzf-flags '--height=80%' '--preview-window=right:50%:wrap'
-zstyle ':fzf-tab:*' fzf-pad 4
+# Generic file previews (with bat/cat fallback) - placed last to avoid overriding specific configs
+zstyle ':fzf-tab:complete:*:*' fzf-preview 'if [[ -f $realpath ]]; then
+  if command -v bat &> /dev/null; then
+    bat --color=always --style=numbers --line-range=:500 $realpath 2>/dev/null
+  else
+    cat $realpath 2>/dev/null | head -500
+  fi
+elif [[ -d $realpath ]]; then
+  ls --color=always $realpath
+fi'
 
 # ========================================
 # History Configuration
