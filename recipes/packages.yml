@@ -11,13 +11,19 @@ modules:
       - fastfetch
       - zsh
       - dash # POSIX-compliant system shell that is up to 4x faster than bash
-      - util-linux-user 
+      - util-linux-user
       - libuser
       - stow
       - yad
       - neovim
       - fzf # Fuzzy finder
       - ghostty # Terminal emulator with enhanced features written in zig
+
+      # Fonts
+      - jetbrains-mono-fonts-all # JetBrains Mono with Nerd Font symbols
+      - fira-code-fonts # Popular coding font with ligatures
+      - google-noto-sans-fonts # Universal font coverage
+      - google-noto-emoji-fonts # Emoji support
 
       # GUI
       - gnome-disk-utility
