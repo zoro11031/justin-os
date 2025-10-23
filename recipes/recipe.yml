@@ -25,15 +25,11 @@ modules:
     scripts:
       - install-rpmfusion.sh
 
-  # DNF packages with COPR repos
+  # DNF packages
   - type: dnf
-    repos:
-      copr:
-        - atim/starship
     install:
       packages:
         - micro
-        - starship
     remove:
       packages:
         - firefox
@@ -61,12 +57,11 @@ modules:
       - xorg-x11-font-utils # Required by msttcore-fonts-installer
       - fontconfig
 
-  # Configure shells, zsh, and install Microsoft fonts (BEFORE changing /bin/sh)
+  # Configure shells and install Microsoft fonts (BEFORE changing /bin/sh)
   - type: script
     scripts:
       - install-ms-fonts-build.sh
       - set-default-shell-zsh.sh
-      - setup-oh-my-zsh.sh
 
   - type: signing
 
