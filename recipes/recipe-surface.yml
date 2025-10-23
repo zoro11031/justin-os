@@ -51,7 +51,6 @@ modules:
     scripts:
       - install-ms-fonts-build.sh
       - set-default-shell-zsh.sh
-      - setup-oh-my-zsh.sh
 
   # Surface-specific packages
   - type: rpm-ostree

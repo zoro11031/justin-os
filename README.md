@@ -13,19 +13,20 @@ Two builds are available:
 
 ## What's Different from Stock?
 
-**Shells & Terminal**  
-Zsh with Oh My Zsh is set as the default shell system-wide. The main build uses dash as the system shell (`/bin/sh`) for faster scripts. Includes modern CLI tools: btop, bat, fzf, neovim, fastfetch, and starship prompt.
+**Shells & Terminal**
+Zsh with Zinit and Powerlevel10k is set as the default shell system-wide. The main build uses dash as the system shell (`/bin/sh`) for faster scripts. Includes modern CLI tools: btop, bat, fzf, neovim, and fastfetch.
 
 All users will use zsh as their default interactive shell.
 
-**Zsh Performance**: Configured for fast startup (~100-200ms vs typical 800ms+ stock Oh My Zsh) with:
-- Direct plugin sourcing instead of loading all of Oh My Zsh
-- Lazy loading for heavy commands
+**Zsh Performance**: Configured for fast startup (~100-200ms) with:
+- Zinit plugin manager for fast, parallel plugin loading
+- Powerlevel10k instant prompt for immediate shell availability
 - Async autosuggestions
 - Fish-like history and completions
+- Optimized completion caching
 
-**Development Tools**  
-Go, Python, micro editor, and starship prompt. Docker and libvirt for containers and VMs.
+**Development Tools**
+Go, Python, and micro editor. Docker and libvirt for containers and VMs.
 
 **Repositories**  
 RPM Fusion (free and nonfree) pre-configured. Surface variant adds linux-surface repo.
@@ -81,8 +82,8 @@ rpm-ostree status
 
 - **Languages**: Go, Python 3
 - **Editors**: neovim, micro
-- **Shell**: zsh with Oh My Zsh (zsh-autosuggestions, zsh-completions, fast-syntax-highlighting, zsh-autopair)
-- **Prompt**: starship
+- **Shell**: zsh with Zinit (zsh-autosuggestions, zsh-completions, zsh-syntax-highlighting, zsh-autopair, fzf-tab)
+- **Prompt**: Powerlevel10k
 - **Containers/VMs**: docker, libvirt
 - **Version Control**: git
 
@@ -114,8 +115,9 @@ rpm-ostree status
 **Performance Tools**:
 - `zsh-bench` - Test shell startup time
 - `zsh-clear-cache` - Clear completion cache
+- `p10k configure` - Customize Powerlevel10k prompt
 
-**Prompt**: Starship (with robbyrussell theme as fallback)
+**Prompt**: Powerlevel10k with instant prompt for fast shell startup
 
 ### GUI Applications
 
@@ -302,13 +304,13 @@ Helper scripts are included in `~/Documents/justin-os-scripts/` for optional man
 
 ## Features
 
-✅ **Zsh by default** - Optimized Oh My Zsh with fast startup (~100-200ms)  
-✅ **Extensive flatpaks** - Productivity, development, and entertainment apps included  
-✅ **Modern CLI tools** - bat, btop, fzf, neovim, starship, ghostty terminal  
-✅ **Development ready** - Go, Python, Docker, libvirt with services enabled  
-✅ **Signed images** - Cryptographically signed with cosign  
-✅ **Surface optimized** - Dedicated build with linux-surface kernel  
-✅ **RPM Fusion enabled** - Free and nonfree repos ready to use  
+✅ **Zsh by default** - Zinit + Powerlevel10k with fast startup (~100-200ms)
+✅ **Extensive flatpaks** - Productivity, development, and entertainment apps included
+✅ **Modern CLI tools** - bat, btop, fzf, neovim, ghostty terminal
+✅ **Development ready** - Go, Python, Docker, libvirt with services enabled
+✅ **Signed images** - Cryptographically signed with cosign
+✅ **Surface optimized** - Dedicated build with linux-surface kernel
+✅ **RPM Fusion enabled** - Free and nonfree repos ready to use
 ✅ **Consolidated recipes** - Clean, readable configuration structure
 
 ## Credits
