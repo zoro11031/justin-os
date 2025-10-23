@@ -172,12 +172,15 @@ fzf_command_preview() {
 
 zstyle ':fzf-tab:complete:-command-:*' fzf-preview 'fzf_command_preview "$word"'
 # Generic file previews (with bat/cat fallback) - placed last to avoid overriding specific configs
+# Note: Directory preview here handles ALL commands (mv, cp, ls, etc.), not just cd/zoxide
 zstyle ':fzf-tab:complete:*:*' fzf-preview 'if [[ -f $realpath ]]; then
   if command -v bat &> /dev/null; then
     bat --color=always --style=numbers --line-range=:500 $realpath 2>/dev/null
   else
     cat $realpath 2>/dev/null | head -500
   fi
+elif [[ -d $realpath ]]; then
+  ls --color=always $realpath
 fi'
 
 # ========================================
