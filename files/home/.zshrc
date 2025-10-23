@@ -123,6 +123,7 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
 # Git previews
+# Optional: install 'delta' for enhanced git diffs (https://github.com/dandavison/delta)
 zstyle ':fzf-tab:complete:git-(add|diff|restore):*' fzf-preview 'git diff $word | delta 2>/dev/null || git diff $word'
 zstyle ':fzf-tab:complete:git-log:*' fzf-preview 'git log --color=always $word'
 zstyle ':fzf-tab:complete:git-help:*' fzf-preview 'git help $word | bat -plman --color=always 2>/dev/null || git help $word'
@@ -140,6 +141,8 @@ zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'SYSTEMD_COLORS=1 systemctl
 zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' fzf-preview 'echo ${(P)word}'
 
 # Command previews (show help/man)
+# Optional: install 'tldr' for simplified command examples (https://tldr.sh)
+# Fallback chain: tldr -> man -> which -> variable expansion
 zstyle ':fzf-tab:complete:-command-:*' fzf-preview '(out=$(tldr --color always "$word") 2>/dev/null && echo $out) || (out=$(man "$word") 2>/dev/null && echo $out) || (out=$(which "$word") 2>/dev/null && echo $out) || echo "${(P)word}"'
 
 # Generic file previews (with bat/cat fallback) - placed last to avoid overriding specific configs
