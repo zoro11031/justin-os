@@ -5,19 +5,27 @@ modules:
       - https://copr.fedorainfracloud.org/coprs/scottames/ghostty/repo/fedora-%OS_VERSION%/scottames-ghostty-fedora-%OS_VERSION%.repo
     install:
       # Shell & Terminal
-      - bat
+      - bat # Syntax highlighting for cat
       - btop
       - dialog
       - fastfetch
       - zsh
       - dash # POSIX-compliant system shell that is up to 4x faster than bash
-      - util-linux-user 
+      - util-linux-user
       - libuser
       - stow
       - yad
       - neovim
       - fzf # Fuzzy finder
       - ghostty # Terminal emulator with enhanced features written in zig
+      - git-delta # Enhanced git diff viewer with syntax highlighting
+      - tealdeer # Fast tldr client for simplified command examples
+
+      # Fonts
+      - jetbrains-mono-fonts-all # JetBrains Mono with Nerd Font symbols
+      - fira-code-fonts # Popular coding font with ligatures
+      - google-noto-sans-fonts # Universal font coverage
+      - google-noto-emoji-fonts # Emoji support
 
       # GUI
       - gnome-disk-utility

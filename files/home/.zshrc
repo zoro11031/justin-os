@@ -70,6 +70,12 @@ zinit snippet OMZP::git
 zinit snippet OMZP::sudo
 zinit snippet OMZP::command-not-found
 
+# Optional OMZ snippets (uncomment if needed)
+# zinit snippet OMZP::archlinux     # Arch Linux specific aliases
+# zinit snippet OMZP::aws           # AWS CLI completions and aliases
+# zinit snippet OMZP::kubectl       # Kubernetes kubectl completions and aliases
+# zinit snippet OMZP::kubectx       # kubectx and kubens completions
+
 # History substring search (replacement for OMZ plugin)
 zinit light zsh-users/zsh-history-substring-search
 
@@ -106,8 +112,76 @@ zstyle ':completion:*:approximate:*' max-errors 1 numeric
 
 # fzf-tab styling
 zstyle ':completion:*' menu no
+
+# fzf-tab preview configurations
+# Global preview window settings (must come before specific configs)
+zstyle ':fzf-tab:*' fzf-flags '--height=80%' '--preview-window=right:50%:wrap'
+zstyle ':fzf-tab:*' fzf-pad 4
+
+# Directory previews
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
+
+# Git previews
+# Optional: install 'delta' for enhanced git diffs (https://github.com/dandavison/delta)
+zstyle ':fzf-tab:complete:git-(add|diff|restore):*' fzf-preview 'git diff $word | delta 2>/dev/null || git diff $word'
+zstyle ':fzf-tab:complete:git-log:*' fzf-preview 'git log --color=always $word'
+zstyle ':fzf-tab:complete:git-help:*' fzf-preview 'git help $word | bat -plman --color=always 2>/dev/null || git help $word'
+zstyle ':fzf-tab:complete:git-show:*' fzf-preview 'git show --color=always $word | delta 2>/dev/null || git show --color=always $word'
+zstyle ':fzf-tab:complete:git-checkout:*' fzf-preview 'git log --color=always $word'
+
+# Process previews
+zstyle ':fzf-tab:complete:(kill|ps):argument-rest' fzf-preview '[[ $group == "[process ID]" ]] && ps --pid=$word -o cmd --no-headers -w -w'
+zstyle ':fzf-tab:complete:(kill|ps):argument-rest' fzf-flags '--preview-window=down:3:wrap'
+
+# Systemd unit previews
+zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'SYSTEMD_COLORS=1 systemctl status $word'
+
+# Environment variable previews
+zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' fzf-preview 'echo ${(P)word}'
+
+# Command previews (show help/man)
+# Optional: install 'tldr' for simplified command examples (https://tldr.sh)
+# Fallback chain: tldr -> man -> which -> variable expansion
+
+# Function for command preview fallback chain
+fzf_command_preview() {
+  local cmd="$1"
+  # Try tldr
+  if command -v tldr &>/dev/null; then
+    local out
+    out=$(tldr --color always "$cmd" 2>/dev/null)
+    if [[ -n "$out" ]]; then
+      echo "$out"
+      return
+    fi
+  fi
+  # Try man
+  if man "$cmd" &>/dev/null; then
+    man "$cmd"
+    return
+  fi
+  # Try which
+  if which "$cmd" &>/dev/null; then
+    which "$cmd"
+    return
+  fi
+  # Variable expansion fallback
+  echo "${(P)cmd}"
+}
+
+zstyle ':fzf-tab:complete:-command-:*' fzf-preview 'fzf_command_preview "$word"'
+# Generic file previews (with bat/cat fallback) - placed last to avoid overriding specific configs
+# Note: Directory preview here handles ALL commands (mv, cp, ls, etc.), not just cd/zoxide
+zstyle ':fzf-tab:complete:*:*' fzf-preview 'if [[ -f $realpath ]]; then
+  if command -v bat &> /dev/null; then
+    bat --color=always --style=numbers --line-range=:500 $realpath 2>/dev/null
+  else
+    cat $realpath 2>/dev/null | head -500
+  fi
+elif [[ -d $realpath ]]; then
+  ls --color=always $realpath
+fi'
 
 # ========================================
 # History Configuration
