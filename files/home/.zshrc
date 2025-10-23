@@ -178,8 +178,6 @@ zstyle ':fzf-tab:complete:*:*' fzf-preview 'if [[ -f $realpath ]]; then
   else
     cat $realpath 2>/dev/null | head -500
   fi
-elif [[ -d $realpath ]]; then
-  ls --color=always $realpath
 fi'
 
 # ========================================
