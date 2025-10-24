@@ -78,10 +78,14 @@ zstyle ':completion:*' menu no
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
+# Dotfiles location
+export DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+
 # Aliases
 alias ls='ls --color'
 alias vim='nvim'
 alias c='clear'
+alias restow='(cd "$DOTFILES" && ./install.sh -r)'
 
 # Shell integrations
 eval "$(fzf --zsh)"
@@ -108,10 +112,13 @@ alias ....='../../..'
 alias .....='../../../..'
 alias d='dirs -v | head -10'
 
+# ========================================
 # Global Aliases (for piping)
+# ========================================
 alias -g H='| head'
 alias -g T='| tail'
 alias -g G='| grep'
 alias -g L="| less"
 alias -g NE="2> /dev/null"
 alias -g NUL="> /dev/null 2>&1"
+
