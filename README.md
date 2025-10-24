@@ -82,7 +82,7 @@ rpm-ostree status
 
 - **Languages**: Go, Python 3
 - **Editors**: neovim, micro
-- **Shell**: zsh with Zinit (zsh-autosuggestions, zsh-completions, zsh-syntax-highlighting, zsh-autopair, fzf-tab)
+- **Shell**: zsh with Zinit (zsh-autosuggestions, zsh-completions, fast-syntax-highlighting, zsh-autopair, fzf-tab, history-substring-search)
 - **Prompt**: Powerlevel10k
 - **Containers/VMs**: docker, libvirt
 - **Version Control**: git
@@ -103,18 +103,17 @@ rpm-ostree status
 - `please` - Re-run last command with sudo
 - `...`, `....`, `.....` - Go up multiple directories
 - `d` - Show last 10 directories
-- `mkcd <dir>` - Create directory and cd into it
-- `extract <file>` - Extract any archive (tar, zip, 7z, etc.)
+- `h` - Show command history
+- `hgrep <term>` - Search command history
+- `c` - Clear terminal
 
 **Pipe Aliases** (use anywhere in a command):
 - `H` - Pipe to head
-- `T` - Pipe to tail  
+- `T` - Pipe to tail
 - `G` - Pipe to grep
 - `L` - Pipe to less
 
-**Performance Tools**:
-- `zsh-bench` - Test shell startup time
-- `zsh-clear-cache` - Clear completion cache
+**Customization**:
 - `p10k configure` - Customize Powerlevel10k prompt
 
 **Prompt**: Powerlevel10k with instant prompt for fast shell startup
