@@ -17,6 +17,7 @@ modules:
       - yad
       - neovim
       - fzf # Fuzzy finder
+      - zoxide # Smarter cd command with frecency-based directory jumping
       - ghostty # Terminal emulator with enhanced features written in zig
       - git-delta # Enhanced git diff viewer with syntax highlighting
       - tealdeer # Fast tldr client for simplified command examples
@@ -58,7 +59,7 @@ modules:
       - virt-top
       - virt-viewer
       - edk2-ovmf
-      
+
       # Development
       - git
       - go
