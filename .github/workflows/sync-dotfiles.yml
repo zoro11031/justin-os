@@ -44,6 +44,7 @@ jobs:
           
           # Copy ghostty config
           if [ -f /tmp/dotfiles-sync/ghostty/.config/ghostty/config ]; then
+            mkdir -p files/home/.config/ghostty
             cp /tmp/dotfiles-sync/ghostty/.config/ghostty/config files/home/.config/ghostty/config
           fi
           
