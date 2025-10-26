@@ -1,11 +1,12 @@
 [Unit]
-Description=Fix VPN certificate SELinux context (permanent)
-After=local-fs.target
-Before=NetworkManager.service
+Description=Fix OpenVPN Certificate SELinux Context
+After=NetworkManager.service
+Documentation=man:chcon(1)
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/fix-vpn-selinux.sh
+EnvironmentFile=/etc/fix-vpn-selinux.env
+ExecStart=/usr/bin/chcon -R -t ${VPN_CERT_CONTEXT} ${VPN_CERT_PATH}
 RemainAfterExit=yes
 StandardOutput=journal
 StandardError=journal
