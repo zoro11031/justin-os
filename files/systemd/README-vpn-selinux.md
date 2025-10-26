@@ -170,7 +170,7 @@ WantedBy=multi-user.target
 This breaks the cycle by only having forward dependencies.
 
 ### Alternative: Using the Script (fix-vpn-selinux.sh)
-The `fix-vpn-selinux.sh` script is included and uses `semanage` to create permanent SELinux rules. However, on Fedora Kinoite, the context still gets reset after reboot due to how the immutable filesystem handles `/var/home`.
+The `fix-vpn-selinux.sh` script is included and uses `semanage` to create permanent SELinux rules. However, on Fedora Kinoite, the context still gets reset after reboot because OSTree (used for system updates and rebases) can reset SELinux contexts in `/var/home` during updates, overriding custom rules. See [Fedora documentation](https://docs.fedoraproject.org/en-US/fedora-silverblue/troubleshooting/#_selinux_contexts_and_ostree) for details.
 
 The script is useful for:
 - Manual troubleshooting: Run `/usr/bin/fix-vpn-selinux.sh` to try semanage approach
