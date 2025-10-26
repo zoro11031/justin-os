@@ -22,62 +22,70 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Clone dotfiles repo
-        run: |
-          git clone --depth 1 https://github.com/zoro11031/dotfiles /tmp/dotfiles-sync
+      - name: Checkout dotfiles repo
+        uses: actions/checkout@v4
+        with:
+          repository: zoro11031/dotfiles
+          path: dotfiles-sync
+          # Use DOTFILES_PAT if configured for private repos, otherwise use GITHUB_TOKEN
+          # Falls back to GITHUB_TOKEN for public repos when DOTFILES_PAT is not configured
+          token: ${{ secrets.DOTFILES_PAT || secrets.GITHUB_TOKEN }}
           
       - name: Copy updated configs
         run: |
           # Copy zsh configs
-          if [ -f /tmp/dotfiles-sync/zsh/.zshrc ]; then
-            cp /tmp/dotfiles-sync/zsh/.zshrc files/home/.zshrc
+          if [ -f dotfiles-sync/zsh/.zshrc ]; then
+            cp dotfiles-sync/zsh/.zshrc files/home/.zshrc
           fi
           
-          if [ -f /tmp/dotfiles-sync/zsh/.p10k.zsh ]; then
-            cp /tmp/dotfiles-sync/zsh/.p10k.zsh files/home/.p10k.zsh
+          if [ -f dotfiles-sync/zsh/.p10k.zsh ]; then
+            cp dotfiles-sync/zsh/.p10k.zsh files/home/.p10k.zsh
           fi
           
           # Copy bash configs
-          if [ -f /tmp/dotfiles-sync/bash/.bashrc ]; then
-            cp /tmp/dotfiles-sync/bash/.bashrc files/home/.bashrc
+          if [ -f dotfiles-sync/bash/.bashrc ]; then
+            cp dotfiles-sync/bash/.bashrc files/home/.bashrc
           fi
           
           # Copy ghostty config
-          if [ -f /tmp/dotfiles-sync/ghostty/.config/ghostty/config ]; then
+          if [ -f dotfiles-sync/ghostty/.config/ghostty/config ]; then
             mkdir -p files/home/.config/ghostty
-            cp /tmp/dotfiles-sync/ghostty/.config/ghostty/config files/home/.config/ghostty/config
+            cp dotfiles-sync/ghostty/.config/ghostty/config files/home/.config/ghostty/config
           fi
           
           # Copy neovim configs
-          if [ -d /tmp/dotfiles-sync/nvim/.config/nvim ]; then
+          if [ -d dotfiles-sync/nvim/.config/nvim ]; then
             mkdir -p files/home/.config/nvim
-            cp -r /tmp/dotfiles-sync/nvim/.config/nvim/* files/home/.config/nvim/
+            cp -r dotfiles-sync/nvim/.config/nvim/* files/home/.config/nvim/
           fi
           
           # Copy git configs
-          if [ -f /tmp/dotfiles-sync/git/.gitconfig ]; then
-            cp /tmp/dotfiles-sync/git/.gitconfig files/home/.gitconfig
+          if [ -f dotfiles-sync/git/.gitconfig ]; then
+            cp dotfiles-sync/git/.gitconfig files/home/.gitconfig
           fi
           
           # Copy tmux config
-          if [ -f /tmp/dotfiles-sync/tmux/.tmux.conf ]; then
-            cp /tmp/dotfiles-sync/tmux/.tmux.conf files/home/.tmux.conf
+          if [ -f dotfiles-sync/tmux/.tmux.conf ]; then
+            cp dotfiles-sync/tmux/.tmux.conf files/home/.tmux.conf
           fi
           
           # Copy vim config
-          if [ -f /tmp/dotfiles-sync/vim/.vimrc ]; then
-            cp /tmp/dotfiles-sync/vim/.vimrc files/home/.vimrc
+          if [ -f dotfiles-sync/vim/.vimrc ]; then
+            cp dotfiles-sync/vim/.vimrc files/home/.vimrc
           fi
           
       - name: Check for changes
         id: check_changes
         run: |
-          if git diff --quiet; then
+          # Check for both tracked modifications and untracked files in files/home/
+          # Scoped to files/home/ to ignore the dotfiles-sync checkout directory
+          if [ -z "$(git status --porcelain -- files/home/)" ]; then
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "No changes detected"
           else
             echo "changed=true" >> $GITHUB_OUTPUT
-            echo "Changes detected"
+            echo "Changes detected:"
+            git status --porcelain -- files/home/
           fi
           
       - name: Commit and push if changed
@@ -95,4 +103,4 @@ jobs:
       - name: Cleanup
         if: always()
         run: |
-          rm -rf /tmp/dotfiles-sync
+          rm -rf dotfiles-sync
