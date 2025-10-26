@@ -28,7 +28,7 @@ jobs:
           repository: zoro11031/dotfiles
           path: dotfiles-sync
           # Use DOTFILES_PAT if configured for private repos, otherwise use GITHUB_TOKEN
-          # This securely handles authentication without exposing tokens in logs
+          # Falls back to GITHUB_TOKEN for public repos when DOTFILES_PAT is not configured
           token: ${{ secrets.DOTFILES_PAT || secrets.GITHUB_TOKEN }}
           
       - name: Copy updated configs
