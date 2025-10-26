@@ -40,6 +40,7 @@ modules:
       - curl # HTTP client
       - wget # File downloader
       - jq # JSON processor
+      - libuser # provides lchsh
 
   # Development tools and virtualization
   - type: rpm-ostree
