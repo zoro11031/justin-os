@@ -9,7 +9,10 @@ This solution uses a systemd service and timer to automatically fix the SELinux 
 ### Files
 - **fix-vpn-selinux.service** - Systemd service that runs chcon to fix SELinux context
 - **fix-vpn-selinux.timer** - Timer that triggers the service 10 minutes after boot
-- **fix-vpn-selinux.sh** - Script with more advanced semanage-based permanent fix (optional)
+- **fix-vpn-selinux.sh** - Optional script with semanage-based approach (can be run manually)
+
+### Automatic Installation
+These files are **automatically installed** during the justin-os image build via the `system-services.yml` recipe. Both the service and timer are enabled by default. You only need the manual installation steps below if you're not using the justin-os image or want to update the files on an existing system.
 
 ### How It Works
 
@@ -107,3 +110,13 @@ WantedBy=multi-user.target
 ```
 
 This breaks the cycle by only having forward dependencies.
+
+### Alternative: Using the Script (fix-vpn-selinux.sh)
+The `fix-vpn-selinux.sh` script is included and uses `semanage` to create permanent SELinux rules. However, on Fedora Kinoite, the context still gets reset after reboot due to how the immutable filesystem handles `/var/home`.
+
+The script is useful for:
+- Manual troubleshooting: Run `/usr/bin/fix-vpn-selinux.sh` to try semanage approach
+- Systems where semanage works properly
+- Understanding the "proper" SELinux fix approach
+
+The service uses the simpler `chcon` approach with a timer for periodic re-application, which is more reliable on Fedora Kinoite.

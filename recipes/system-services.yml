@@ -10,6 +10,8 @@ modules:
         destination: /usr/bin/fix-vpn-selinux.sh
       - source: systemd/fix-vpn-selinux.service
         destination: /usr/lib/systemd/system/fix-vpn-selinux.service
+      - source: systemd/fix-vpn-selinux.timer
+        destination: /usr/lib/systemd/system/fix-vpn-selinux.timer
 
   # Dash shell service (for main build only)
   - type: files
@@ -22,4 +24,5 @@ modules:
     system:
       enabled:
         - fix-vpn-selinux.service
+        - fix-vpn-selinux.timer
         - set-dash-as-sh.service
