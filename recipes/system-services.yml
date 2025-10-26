@@ -8,6 +8,8 @@ modules:
     files:
       - source: scripts/fix-vpn-selinux.sh
         destination: /usr/bin/fix-vpn-selinux.sh
+      - source: systemd/fix-vpn-selinux.env
+        destination: /etc/fix-vpn-selinux.env
       - source: systemd/fix-vpn-selinux.service
         destination: /usr/lib/systemd/system/fix-vpn-selinux.service
       - source: systemd/fix-vpn-selinux.timer
