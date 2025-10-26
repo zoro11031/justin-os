@@ -77,14 +77,15 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          # Check for both tracked modifications and untracked files across entire repository
-          if [ -z "$(git status --porcelain)" ]; then
+          # Check for both tracked modifications and untracked files in files/home/
+          # Scoped to files/home/ to ignore the dotfiles-sync checkout directory
+          if [ -z "$(git status --porcelain -- files/home/)" ]; then
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "No changes detected"
           else
             echo "changed=true" >> $GITHUB_OUTPUT
             echo "Changes detected:"
-            git status --porcelain
+            git status --porcelain -- files/home/
           fi
           
       - name: Commit and push if changed
