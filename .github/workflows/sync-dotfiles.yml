@@ -22,16 +22,14 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Clone dotfiles repo
-        env:
-          DOTFILES_PAT: ${{ secrets.DOTFILES_PAT }}
-        run: |
-          # Use PAT if available for private repos or enhanced security
-          if [ -n "$DOTFILES_PAT" ]; then
-            git clone --depth 1 https://$DOTFILES_PAT@github.com/zoro11031/dotfiles.git /tmp/dotfiles-sync
-          else
-            git clone --depth 1 https://github.com/zoro11031/dotfiles /tmp/dotfiles-sync
-          fi
+      - name: Checkout dotfiles repo
+        uses: actions/checkout@v4
+        with:
+          repository: zoro11031/dotfiles
+          path: /tmp/dotfiles-sync
+          # Use DOTFILES_PAT if configured for private repos, otherwise use GITHUB_TOKEN
+          # This securely handles authentication without exposing tokens in logs
+          token: ${{ secrets.DOTFILES_PAT || secrets.GITHUB_TOKEN }}
           
       - name: Copy updated configs
         run: |
