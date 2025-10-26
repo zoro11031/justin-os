@@ -1,0 +1,98 @@
+name: Sync Dotfiles
+
+on:
+  # Run daily at 2 AM UTC
+  schedule:
+    - cron: '0 2 * * *'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+  
+  # Run when dotfiles repo updates (requires webhook)
+  repository_dispatch:
+    types: [dotfiles-updated]
+
+jobs:
+  sync-dotfiles:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout justin-os
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Clone dotfiles repo
+        run: |
+          git clone --depth 1 https://github.com/zoro11031/dotfiles /tmp/dotfiles-sync
+          
+      - name: Copy updated configs
+        run: |
+          # Copy zsh configs
+          if [ -f /tmp/dotfiles-sync/zsh/.zshrc ]; then
+            cp /tmp/dotfiles-sync/zsh/.zshrc files/home/.zshrc
+          fi
+          
+          if [ -f /tmp/dotfiles-sync/zsh/.p10k.zsh ]; then
+            cp /tmp/dotfiles-sync/zsh/.p10k.zsh files/home/.p10k.zsh
+          fi
+          
+          # Copy bash configs
+          if [ -f /tmp/dotfiles-sync/bash/.bashrc ]; then
+            cp /tmp/dotfiles-sync/bash/.bashrc files/home/.bashrc
+          fi
+          
+          # Copy ghostty config
+          if [ -f /tmp/dotfiles-sync/ghostty/.config/ghostty/config ]; then
+            mkdir -p files/home/.config/ghostty
+            cp /tmp/dotfiles-sync/ghostty/.config/ghostty/config files/home/.config/ghostty/config
+          fi
+          
+          # Copy neovim configs
+          if [ -d /tmp/dotfiles-sync/nvim/.config/nvim ]; then
+            mkdir -p files/home/.config/nvim
+            cp -r /tmp/dotfiles-sync/nvim/.config/nvim/* files/home/.config/nvim/
+          fi
+          
+          # Copy git configs
+          if [ -f /tmp/dotfiles-sync/git/.gitconfig ]; then
+            cp /tmp/dotfiles-sync/git/.gitconfig files/home/.gitconfig
+          fi
+          
+          # Copy tmux config
+          if [ -f /tmp/dotfiles-sync/tmux/.tmux.conf ]; then
+            cp /tmp/dotfiles-sync/tmux/.tmux.conf files/home/.tmux.conf
+          fi
+          
+          # Copy vim config
+          if [ -f /tmp/dotfiles-sync/vim/.vimrc ]; then
+            cp /tmp/dotfiles-sync/vim/.vimrc files/home/.vimrc
+          fi
+          
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes detected"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Changes detected"
+          fi
+          
+      - name: Commit and push if changed
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add files/home/
+          git commit -m "chore: sync dotfiles from zoro11031/dotfiles
+
+          Auto-synced by GitHub Actions
+          Source: https://github.com/zoro11031/dotfiles"
+          git push
+          
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -rf /tmp/dotfiles-sync
