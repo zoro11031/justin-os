@@ -23,8 +23,15 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Clone dotfiles repo
+        env:
+          DOTFILES_PAT: ${{ secrets.DOTFILES_PAT }}
         run: |
-          git clone --depth 1 https://github.com/zoro11031/dotfiles /tmp/dotfiles-sync
+          # Use PAT if available for private repos or enhanced security
+          if [ -n "$DOTFILES_PAT" ]; then
+            git clone --depth 1 https://$DOTFILES_PAT@github.com/zoro11031/dotfiles.git /tmp/dotfiles-sync
+          else
+            git clone --depth 1 https://github.com/zoro11031/dotfiles /tmp/dotfiles-sync
+          fi
           
       - name: Copy updated configs
         run: |
@@ -72,12 +79,14 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          if git diff --quiet; then
+          # Check for both tracked modifications and untracked files
+          if [ -z "$(git status --porcelain files/home/)" ]; then
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "No changes detected"
           else
             echo "changed=true" >> $GITHUB_OUTPUT
-            echo "Changes detected"
+            echo "Changes detected:"
+            git status --porcelain files/home/
           fi
           
       - name: Commit and push if changed
