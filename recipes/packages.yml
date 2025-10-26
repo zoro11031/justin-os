@@ -11,8 +11,6 @@ modules:
       - fastfetch
       - zsh
       - dash # POSIX-compliant system shell that is up to 4x faster than bash
-      - util-linux-user
-      - libuser
       - stow
       - yad
       - neovim
