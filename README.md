@@ -290,6 +290,28 @@ Follow the prompts and reboot to complete enrollment.
 
 See `docs/` folder for more troubleshooting guides.
 
+## Automated Dotfiles Sync
+
+This repository automatically syncs dotfiles from [zoro11031/dotfiles](https://github.com/zoro11031/dotfiles) daily and creates pull requests with any changes.
+
+**Setup Requirements:**
+
+To enable PR creation, you need to either:
+
+1. **Use a Personal Access Token (recommended):**
+   - Create a GitHub PAT with `repo` or `public_repo` scope
+   - Add it as a repository secret named `GH_PAT`
+   - Go to Settings → Secrets and variables → Actions → New repository secret
+
+2. **Enable GitHub Actions PR permission:**
+   - Go to Settings → Actions → General
+   - Enable "Allow GitHub Actions to create and approve pull requests"
+
+The workflow runs:
+- Daily at 2 AM UTC
+- Manually via workflow_dispatch
+- On webhook from dotfiles repo updates
+
 ## Documentation
 
 Additional documentation is available in the `docs/` folder:
