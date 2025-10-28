@@ -95,9 +95,24 @@ jobs:
       - name: Create PR with changes
         if: steps.check_changes.outputs.changed == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Use GH_PAT if available (recommended), otherwise fall back to GITHUB_TOKEN
+          # Note: GITHUB_TOKEN requires "Allow GitHub Actions to create and approve pull requests"
+          # to be enabled in repository Settings → Actions → General
+          GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         run: |
           set -eo pipefail
+
+          # Check if we're using a PAT or GITHUB_TOKEN
+          if [ -z "${{ secrets.GH_PAT }}" ]; then
+            echo "⚠️  Using default GITHUB_TOKEN (GH_PAT secret not configured)"
+            echo "If PR creation fails, you need to either:"
+            echo "  1. Add a GH_PAT secret with 'repo' or 'public_repo' scope, OR"
+            echo "  2. Enable 'Allow GitHub Actions to create and approve pull requests'"
+            echo "     in Settings → Actions → General"
+            echo ""
+          else
+            echo "✓ Using GH_PAT secret for authentication"
+          fi
 
           # Configure git
           git config user.name "github-actions[bot]"
