@@ -1,15 +1,13 @@
 [Unit]
-Description=Fix OpenVPN Certificate SELinux Context
+Description=Fix VPN certificate SELinux context
 After=NetworkManager.service
-Documentation=man:chcon(1)
 
 [Service]
 Type=oneshot
-EnvironmentFile=/etc/fix-vpn-selinux.env
-ExecStart=/usr/bin/chcon -R -t ${VPN_CERT_CONTEXT} ${VPN_CERT_PATH}
+EnvironmentFile=-/etc/fix-vpn-selinux.env
+ExecStart=/usr/bin/chcon -R -t ${VPN_CERT_CONTEXT:-home_cert_t} ${VPN_CERT_PATH:-/var/home/%u/.cert}
+ExecStart=/usr/bin/chcon -R -t ${VPN_CERT_CONTEXT:-home_cert_t} ${VPN_NM_CERT_PATH:-/var/home/%u/.local/share/networkmanagement/certificates/nm-openvpn}
 RemainAfterExit=yes
-StandardOutput=journal
-StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
