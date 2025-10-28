@@ -111,7 +111,7 @@ jobs:
           PR_BODY="$RUNNER_TEMP/pr_body.md"
           echo "## Changed Files" > "$PR_BODY"
           echo "" >> "$PR_BODY"
-          git diff --cached --name-only | while read file; do
+          git diff --cached --name-only | while IFS= read -r file; do
             echo "- \`$file\`" >> "$PR_BODY"
           done
           echo "" >> "$PR_BODY"
