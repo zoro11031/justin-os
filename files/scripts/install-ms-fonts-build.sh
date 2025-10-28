@@ -24,8 +24,8 @@ if ! curl -L -f --retry 3 --retry-delay 5 --max-time 300 \
 fi
 
 echo "Installing msttcore-fonts-installer to /usr/share/fonts/..."
-# Dependencies are already installed, no need for --nodeps
-if ! rpm -ivh msttcore-fonts-installer.rpm; then
+# Use --nodigest for Fedora 43+ compatibility (package doesn't have digest signature)
+if ! rpm -ivh --nodigest msttcore-fonts-installer.rpm; then
   echo "ERROR: Failed to install msttcore-fonts-installer" >&2
   exit ${E_INSTALL}
 fi
