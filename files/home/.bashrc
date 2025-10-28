@@ -27,3 +27,4 @@ if [ -d ~/.bashrc.d ]; then
     done
 fi
 unset rc
+[ ! -z "$PS1" ] && exec /usr/bin/zsh

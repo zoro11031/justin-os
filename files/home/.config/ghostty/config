@@ -23,5 +23,5 @@ palette = 13=#8e44ad
 palette = 14=#16a085
 palette = 15=#fcfcfc
 font-size = 11
-font-family = "JetBrains Mono"
+font-family = "MesloLGS NF"
 adjust-cursor-thickness = +30
