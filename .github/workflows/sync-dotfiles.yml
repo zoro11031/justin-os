@@ -15,7 +15,9 @@ on:
 jobs:
   sync-dotfiles:
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: write  # Required to push commits
+
     steps:
       - name: Checkout justin-os
         uses: actions/checkout@v4
