@@ -182,7 +182,7 @@ Flatpaks are installed via the default-flatpaks module during the image build. I
 
 The `justin-os-surface` variant includes:
 
-- **Base**: Fedora 42 (until linux-surface adds F43 support)
+- **Base**: Fedora 42 (the Surface build requires the linux-surface kernel, which is not yet available for Fedora 43; will upgrade once support is added)
 - **Kernel**: kernel-surface, kernel-surface-default-watchdog
 - **Touchscreen**: iptsd (touchscreen firmware)
 - **Hardware**: libwacom-surface, thermald
