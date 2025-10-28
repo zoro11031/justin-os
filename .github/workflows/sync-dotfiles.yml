@@ -108,18 +108,19 @@ jobs:
           git add files/home/
 
           # Generate description of changes
-          echo "## Changed Files" > /tmp/pr_body.md
-          echo "" >> /tmp/pr_body.md
+          PR_BODY="$RUNNER_TEMP/pr_body.md"
+          echo "## Changed Files" > "$PR_BODY"
+          echo "" >> "$PR_BODY"
           git diff --cached --name-only | while read file; do
-            echo "- \`$file\`" >> /tmp/pr_body.md
+            echo "- \`$file\`" >> "$PR_BODY"
           done
-          echo "" >> /tmp/pr_body.md
-          echo "## Summary of Changes" >> /tmp/pr_body.md
-          echo "" >> /tmp/pr_body.md
-          git diff --cached --stat >> /tmp/pr_body.md
-          echo "" >> /tmp/pr_body.md
-          echo "---" >> /tmp/pr_body.md
-          echo "Auto-synced from [zoro11031/dotfiles](https://github.com/zoro11031/dotfiles)" >> /tmp/pr_body.md
+          echo "" >> "$PR_BODY"
+          echo "## Summary of Changes" >> "$PR_BODY"
+          echo "" >> "$PR_BODY"
+          git diff --cached --stat >> "$PR_BODY"
+          echo "" >> "$PR_BODY"
+          echo "---" >> "$PR_BODY"
+          echo "Auto-synced from [zoro11031/dotfiles](https://github.com/zoro11031/dotfiles)" >> "$PR_BODY"
 
           # Commit
           git commit -m "chore: sync dotfiles from zoro11031/dotfiles"
@@ -130,7 +131,7 @@ jobs:
           # Create PR
           gh pr create \
             --title "chore: sync dotfiles - $(date +%Y-%m-%d)" \
-            --body-file /tmp/pr_body.md \
+            --body-file "$PR_BODY" \
             --base main
           
       - name: Cleanup
