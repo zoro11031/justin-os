@@ -125,7 +125,7 @@ jobs:
 
           # Use process substitution to avoid subshell issue
           while IFS= read -r file; do
-            echo "- \`$file\`" >> "$PR_BODY"
+            echo "- \\\`$file\\\`" >> "$PR_BODY"
           done < <(git diff --cached --name-only)
 
           echo "" >> "$PR_BODY"
