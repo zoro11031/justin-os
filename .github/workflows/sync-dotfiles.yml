@@ -16,7 +16,8 @@ jobs:
   sync-dotfiles:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Required to push commits
+      contents: write        # Required to push commits
+      pull-requests: write   # Required to create PRs
 
     steps:
       - name: Checkout justin-os
@@ -90,17 +91,47 @@ jobs:
             git status --porcelain -- files/home/
           fi
           
-      - name: Commit and push if changed
+      - name: Create PR with changes
         if: steps.check_changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Configure git
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add files/home/
-          git commit -m "chore: sync dotfiles from zoro11031/dotfiles
 
-          Auto-synced by GitHub Actions
-          Source: https://github.com/zoro11031/dotfiles"
-          git push
+          # Create a new branch
+          BRANCH_NAME="sync-dotfiles-$(date +%Y%m%d-%H%M%S)"
+          git checkout -b "$BRANCH_NAME"
+
+          # Stage and commit changes
+          git add files/home/
+
+          # Generate description of changes
+          echo "## Changed Files" > /tmp/pr_body.md
+          echo "" >> /tmp/pr_body.md
+          git diff --cached --name-only | while read file; do
+            echo "- \`$file\`" >> /tmp/pr_body.md
+          done
+          echo "" >> /tmp/pr_body.md
+          echo "## Summary of Changes" >> /tmp/pr_body.md
+          echo "" >> /tmp/pr_body.md
+          git diff --cached --stat >> /tmp/pr_body.md
+          echo "" >> /tmp/pr_body.md
+          echo "---" >> /tmp/pr_body.md
+          echo "Auto-synced from [zoro11031/dotfiles](https://github.com/zoro11031/dotfiles)" >> /tmp/pr_body.md
+
+          # Commit
+          git commit -m "chore: sync dotfiles from zoro11031/dotfiles"
+
+          # Push to remote
+          git push -u origin "$BRANCH_NAME"
+
+          # Create PR
+          gh pr create \
+            --title "chore: sync dotfiles - $(date +%Y-%m-%d)" \
+            --body-file /tmp/pr_body.md \
+            --base main
           
       - name: Cleanup
         if: always()
