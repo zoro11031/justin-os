@@ -58,6 +58,20 @@ bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
 bindkey '^[w' kill-region
 
+# Fix Delete, Home, End keys
+bindkey '^[[3~' delete-char                    # Delete key
+bindkey '^[[H' beginning-of-line               # Home key
+bindkey '^[[F' end-of-line                     # End key
+bindkey '^[[1~' beginning-of-line              # Home key (alternate)
+bindkey '^[[4~' end-of-line                    # End key (alternate)
+
+# Use terminfo for better terminal compatibility (if available)
+if (( ${+terminfo} )); then
+  [[ -n "${terminfo[kdch1]}" ]] && bindkey "${terminfo[kdch1]}" delete-char
+  [[ -n "${terminfo[khome]}" ]] && bindkey "${terminfo[khome]}" beginning-of-line
+  [[ -n "${terminfo[kend]}" ]] && bindkey "${terminfo[kend]}" end-of-line
+fi
+
 # History
 HISTSIZE=5000
 HISTFILE=~/.zsh_history

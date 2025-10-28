@@ -218,9 +218,9 @@
   typeset -g POWERLEVEL9K_DIR_BACKGROUND=39
   # Default current directory foreground color.
   typeset -g POWERLEVEL9K_DIR_FOREGROUND=232
-  # If directory is too long, shorten some of its segments to the shortest possible unique
-  # prefix. The shortened directory can be tab-completed to the original.
-  typeset -g POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique
+  # Shorten directories by truncating each segment from the right side,
+  # except the last one, which is always shown in full.
+  typeset -g POWERLEVEL9K_SHORTEN_STRATEGY=truncate_from_right
   # Replace removed segment suffixes with this symbol.
   typeset -g POWERLEVEL9K_SHORTEN_DELIMITER=
   # Color of the shortened directory segments.
@@ -275,7 +275,7 @@
   # directory will be shortened only when prompt doesn't fit or when other parameters demand it
   # (see POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS and POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT below).
   # If set to `0`, directory will always be shortened to its minimum length.
-  typeset -g POWERLEVEL9K_DIR_MAX_LENGTH=80
+  typeset -g POWERLEVEL9K_DIR_MAX_LENGTH=50
   # When `dir` segment is on the last prompt line, try to shorten it enough to leave at least this
   # many columns for typing commands.
   typeset -g POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS=40
@@ -348,7 +348,30 @@
   # parameter. For example, if POWERLEVEL9K_DIR_WORK_NOT_WRITABLE_FOREGROUND is not set, it falls
   # back to POWERLEVEL9K_DIR_FOREGROUND.
   #
-  typeset -g POWERLEVEL9K_DIR_CLASSES=()
+  typeset -g POWERLEVEL9K_DIR_CLASSES=(
+    '~'                HOME        ''
+    '~/*'              HOME        ''
+    '*/Downloads(|/*)' DOWNLOADS   ''
+    '*/Documents(|/*)' DOCUMENTS   ''
+    '*/.config(|/*)'   CONFIG      ''
+    '*'                DEFAULT     ''
+  )
+
+  # Home directory styling with Nerd Font icon
+  # The following contains a Nerd Font icon character (U+F015, "home" icon).
+  # It may appear empty in some editors if the font does not support Nerd Font icons.
+  typeset -g POWERLEVEL9K_DIR_HOME_VISUAL_IDENTIFIER_EXPANSION=''
+  typeset -g POWERLEVEL9K_DIR_HOME_BACKGROUND=39
+  typeset -g POWERLEVEL9K_DIR_HOME_FOREGROUND=232
+
+  # Downloads directory styling
+  typeset -g POWERLEVEL9K_DIR_DOWNLOADS_VISUAL_IDENTIFIER_EXPANSION=''
+
+  # Documents directory styling
+  typeset -g POWERLEVEL9K_DIR_DOCUMENTS_VISUAL_IDENTIFIER_EXPANSION=''
+
+  # Config directory styling
+  typeset -g POWERLEVEL9K_DIR_CONFIG_VISUAL_IDENTIFIER_EXPANSION=''
 
   # Custom prefix.
   # typeset -g POWERLEVEL9K_DIR_PREFIX='in '
@@ -362,7 +385,7 @@
   typeset -g POWERLEVEL9K_VCS_LOADING_BACKGROUND=8
 
   # Branch icon. Set this parameter to '\UE0A0 ' for the popular Powerline branch icon.
-  typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=
+  typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=$'\uf418 ' # Nerd Font git branch icon
 
   # Untracked files icon. It's really a question mark, your font isn't broken.
   # Change the value of this parameter to show a different icon.
