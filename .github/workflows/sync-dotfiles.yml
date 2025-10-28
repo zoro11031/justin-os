@@ -59,7 +59,8 @@ jobs:
           # Copy neovim configs
           if [ -d dotfiles-sync/nvim/.config/nvim ]; then
             mkdir -p files/home/.config/nvim
-            cp -r dotfiles-sync/nvim/.config/nvim/* files/home/.config/nvim/
+            # Use rsync to handle hidden files and empty directories
+            rsync -a dotfiles-sync/nvim/.config/nvim/ files/home/.config/nvim/
           fi
           
           # Copy git configs
@@ -83,10 +84,10 @@ jobs:
           # Check for both tracked modifications and untracked files in files/home/
           # Scoped to files/home/ to ignore the dotfiles-sync checkout directory
           if [ -z "$(git status --porcelain -- files/home/)" ]; then
-            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "No changes detected"
           else
-            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "Changes detected:"
             git status --porcelain -- files/home/
           fi
@@ -96,12 +97,22 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -eo pipefail
+
           # Configure git
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          # Capture timestamp once for consistency
+          TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
+          DATE_ONLY="$(date +%Y-%m-%d)"
+
+          # Detect default branch dynamically
+          DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+          echo "Using base branch: $DEFAULT_BRANCH"
+
           # Create a new branch
-          BRANCH_NAME="sync-dotfiles-$(date +%Y%m%d-%H%M%S)"
+          BRANCH_NAME="sync-dotfiles-$TIMESTAMP"
           git checkout -b "$BRANCH_NAME"
 
           # Stage and commit changes
@@ -111,9 +122,12 @@ jobs:
           PR_BODY="$RUNNER_TEMP/pr_body.md"
           echo "## Changed Files" > "$PR_BODY"
           echo "" >> "$PR_BODY"
-          git diff --cached --name-only | while IFS= read -r file; do
+
+          # Use process substitution to avoid subshell issue
+          while IFS= read -r file; do
             echo "- \`$file\`" >> "$PR_BODY"
-          done
+          done < <(git diff --cached --name-only)
+
           echo "" >> "$PR_BODY"
           echo "## Summary of Changes" >> "$PR_BODY"
           echo "" >> "$PR_BODY"
@@ -130,9 +144,12 @@ jobs:
 
           # Create PR
           gh pr create \
-            --title "chore: sync dotfiles - $(date +%Y-%m-%d)" \
+            --title "chore: sync dotfiles - $DATE_ONLY" \
             --body-file "$PR_BODY" \
-            --base main
+            --base "$DEFAULT_BRANCH"
+
+          # Clean up temporary file
+          rm -f "$PR_BODY"
           
       - name: Cleanup
         if: always()
