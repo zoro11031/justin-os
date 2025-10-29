@@ -1,9 +1,4 @@
 modules:
-  # Ensure the Microsoft GPG key is present before adding the repo
-  - type: script
-    scripts:
-      - ensure-microsoft-gpg.sh
-
   # Microsoft VS Code repository setup
   - type: rpm-ostree
     repos:
