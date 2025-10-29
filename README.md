@@ -41,7 +41,7 @@ Linux-surface kernel for better hardware support, touchscreen firmware (iptsd), 
 
 You need an existing Fedora Atomic install (Silverblue, Kinoite, or any uBlue variant).
 
-### Main Build (KDE)
+### Main Build (KDE) - Fedora 43
 
 First rebase to unsigned image:
 
@@ -54,6 +54,19 @@ After reboot, switch to signed:
 
 ```bash
 rpm-ostree rebase ostree-image-signed:docker://ghcr.io/zoro11031/justin-os:latest
+systemctl reboot
+```
+
+### Main Build (KDE) - Fedora 42
+
+For Fedora 42 compatibility, use the `br-fedora-42-42` tag:
+
+```bash
+rpm-ostree rebase ostree-unverified-registry:ghcr.io/zoro11031/justin-os:br-fedora-42-42
+systemctl reboot
+
+# After reboot:
+rpm-ostree rebase ostree-image-signed:docker://ghcr.io/zoro11031/justin-os:br-fedora-42-42
 systemctl reboot
 ```
 
@@ -253,7 +266,13 @@ The `cosign.pub` file is in this repo.
 
 ### Flatpaks didn't install during build
 
-If flatpaks are missing after installation, you can manually install them using the provided scripts:
+If flatpaks are missing after installation, you can install them using:
+
+```bash
+bluebuild-flatpak-manager apply all
+```
+
+Alternatively, you can manually install them using the provided scripts:
 
 ```bash
 cd ~/Documents/justin-os-scripts/

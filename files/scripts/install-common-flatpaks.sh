@@ -20,8 +20,8 @@ fi
 
 echo "Installing common Flatpaks..."
 
-# Ensure Flathub is added
-flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+# Ensure Flathub is added (system-wide)
+flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
 # List of flatpak IDs to install (POSIX doesn't support arrays, use space-separated list)
 FLATPAKS="com.bitwarden.desktop
@@ -68,7 +68,7 @@ SUCCEEDED_COUNT=0
 
 for app in $FLATPAKS; do
     echo "Installing $app..."
-    if flatpak install -y flathub "$app" 2>/dev/null; then
+    if flatpak install --system --noninteractive -y flathub "$app" 2>/dev/null; then
         SUCCEEDED="$SUCCEEDED$app
 "
         SUCCEEDED_COUNT=$((SUCCEEDED_COUNT + 1))
