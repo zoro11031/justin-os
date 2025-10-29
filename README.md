@@ -347,7 +347,7 @@ Helper scripts are included in `~/Documents/justin-os-scripts/` for optional man
 
 ✅ **Zsh by default** - Zinit + Powerlevel10k with fast startup (~100-200ms)
 ✅ **Extensive flatpaks** - Productivity, development, and entertainment apps included
-✅ **Modern CLI tools** - bat, btop, fzf, neovim, ghostty terminal
+✅ **Modern CLI tools** - bat, btop, fzf, neovim, kitty terminal
 ✅ **Development ready** - Go, Python, Docker, libvirt with services enabled
 ✅ **Signed images** - Cryptographically signed with cosign
 ✅ **Surface optimized** - Dedicated build with linux-surface kernel

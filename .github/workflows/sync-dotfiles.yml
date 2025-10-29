@@ -50,10 +50,10 @@ jobs:
             cp dotfiles-sync/bash/.bashrc files/home/.bashrc
           fi
           
-          # Copy ghostty config
-          if [ -f dotfiles-sync/ghostty/.config/ghostty/config ]; then
-            mkdir -p files/home/.config/ghostty
-            cp dotfiles-sync/ghostty/.config/ghostty/config files/home/.config/ghostty/config
+          # Copy kitty config
+          if [ -f dotfiles-sync/kitty/.config/kitty/kitty.conf ]; then
+            mkdir -p files/home/.config/kitty
+            cp dotfiles-sync/kitty/.config/kitty/kitty.conf files/home/.config/kitty/kitty.conf
           fi
           
           # Copy neovim configs
