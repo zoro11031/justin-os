@@ -123,13 +123,16 @@ fi
 
 attempt=1
 while (( attempt <= RETRIES )); do
-  if curl --connect-timeout 10 --max-time 60 -fsSL "$KEY_URL" -o "$TMP_KEY" \
-      && install_key_from "$TMP_KEY"; then
-    echo "Microsoft GPG key installed successfully."
-    exit 0
+  if curl --connect-timeout 10 --max-time 60 -fsSL "$KEY_URL" -o "$TMP_KEY"; then
+    if install_key_from "$TMP_KEY"; then
+      echo "Microsoft GPG key installed successfully."
+      exit 0
+    else
+      echo "Attempt $attempt: Key validation failed for downloaded Microsoft GPG key." >&2
+    fi
+  else
+    echo "Attempt $attempt: Network failure while downloading Microsoft GPG key." >&2
   fi
-
-  echo "Attempt $attempt to download Microsoft GPG key failed." >&2
   if (( attempt < RETRIES )); then
     sleep "$SLEEP_SECONDS"
   fi
