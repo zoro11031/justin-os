@@ -86,12 +86,18 @@ jobs:
                 seen_paths[$final_path]="$category"
               done < <(find "$source" -mindepth 1 \( -type f -o -type l \) -print0)
 
-              if output=$(rsync -a --itemize-changes "$rsync_source" "$rsync_dest"); then
+              output=$(rsync -a --itemize-changes "$rsync_source" "$rsync_dest" 2>&1)
+              rsync_status=$?
+              if [ $rsync_status -eq 0 ]; then
                 if [ -n "$output" ]; then
                   echo "$output" | sed 's/^/  /'
                 else
                   echo "  No differences detected for $category"
                 fi
+              else
+                echo "Error syncing configs from $category:"
+                echo "$output" | sed 's/^/  /'
+                exit $rsync_status
               fi
 
             else
