@@ -42,6 +42,9 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# Returns the uppercase fingerprint for the given key file. A blank result
+# means gpg could not parse the file, indicating an invalid key payload or a
+# tooling failure upstream.
 fingerprint_for() {
   local key_file="$1"
   gpg --with-colons --show-keys "$key_file" | awk -F: '/^fpr:/ {print toupper($10); exit}'
@@ -58,6 +61,7 @@ ensure_key_file_matches() {
   fingerprint="$(fingerprint_for "$key_file")"
 
   if [[ -z "$fingerprint" ]]; then
+    echo "Unable to read fingerprint from $key_file" >&2
     return 1
   fi
 
@@ -125,5 +129,5 @@ if install_key_from "$FALLBACK_TMP"; then
   exit 0
 fi
 
-echo "ERROR: Embedded Microsoft GPG key did not match expected fingerprint." >&2
+echo "ERROR: Failed to install embedded Microsoft GPG key." >&2
 exit 1
