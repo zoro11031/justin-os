@@ -51,10 +51,13 @@ fingerprint_for() {
   local key_file="$1"
   local gpg_output
 
-  if ! gpg_output="$(gpg --with-colons --show-keys "$key_file" 2>/dev/null)"; then
-    echo "gpg failed to inspect $key_file" >&2
+  if ! gpg_output_and_err="$(gpg --with-colons --show-keys "$key_file" 2>&1)"; then
+    echo "gpg failed to inspect $key_file (gpg may not be installed or file may be corrupted)" >&2
+    echo "gpg error output:" >&2
+    echo "$gpg_output_and_err" >&2
     return 1
   fi
+  gpg_output="$gpg_output_and_err"
 
   awk -F: '/^fpr:/ {print toupper($10); exit}' <<<"$gpg_output"
 }
