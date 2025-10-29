@@ -1,10 +1,13 @@
 modules:
+  # Ensure the Microsoft GPG key is present before adding the repo
+  - type: script
+    scripts:
+      - ensure-microsoft-gpg.sh
+
   # Microsoft VS Code repository setup
   - type: rpm-ostree
     repos:
       - vscode.repo # stage local repo definition from files/rpm-ostree/vscode.repo
-    keys:
-      - https://packages.microsoft.com/keys/microsoft.asc
     install:
       - code
 
