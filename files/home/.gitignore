@@ -1,0 +1,31 @@
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup files
+*.swp
+*.swo
+*~
+.*.swp
+.*.swo
+
+# Local customizations (user-specific files that shouldn't be shared)
+*.local
+*local.sh
+*local.bash
+*local.zsh
+
+# vim
+.vim/plugged/
+.vim/.netrwhist
+.vim/autoload/
+
+# secrets
+*.secret
+*.key
+*.pem
