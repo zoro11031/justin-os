@@ -1,9 +1,17 @@
 modules:
+  # Microsoft VS Code repository setup
+  - type: rpm-ostree
+    repos:
+      - https://packages.microsoft.com/yumrepos/vscode
+    keys:
+      - https://packages.microsoft.com/keys/microsoft.asc
+    install:
+      - code
+
   # Core system packages and utilities
   - type: rpm-ostree
     repos:
       - https://copr.fedorainfracloud.org/coprs/scottames/ghostty/repo/fedora-%OS_VERSION%/scottames-ghostty-fedora-%OS_VERSION%.repo
-      - https://packages.microsoft.com/yumrepos/vscode # Added VS Code repo
     install:
       # Shell & Terminal
       - bat # Syntax highlighting for cat
@@ -20,7 +28,6 @@ modules:
       - ghostty # Terminal emulator with enhanced features written in zig
       - git-delta # Enhanced git diff viewer with syntax highlighting
       - tealdeer # Fast tldr client for simplified command examples
-      - code # Visual Studio Code package
 
       # Fonts
       - jetbrains-mono-fonts-all # JetBrains Mono with Nerd Font symbols
