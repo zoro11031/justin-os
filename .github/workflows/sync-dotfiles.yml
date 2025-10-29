@@ -36,46 +36,28 @@ jobs:
           
       - name: Copy updated configs
         run: |
-          # Copy zsh configs
-          if [ -f dotfiles-sync/zsh/.zshrc ]; then
-            cp dotfiles-sync/zsh/.zshrc files/home/.zshrc
-          fi
-          
-          if [ -f dotfiles-sync/zsh/.p10k.zsh ]; then
-            cp dotfiles-sync/zsh/.p10k.zsh files/home/.p10k.zsh
-          fi
-          
-          # Copy bash configs
-          if [ -f dotfiles-sync/bash/.bashrc ]; then
-            cp dotfiles-sync/bash/.bashrc files/home/.bashrc
-          fi
-          
-          # Copy ghostty config
-          if [ -f dotfiles-sync/ghostty/.config/ghostty/config ]; then
-            mkdir -p files/home/.config/ghostty
-            cp dotfiles-sync/ghostty/.config/ghostty/config files/home/.config/ghostty/config
-          fi
-          
-          # Copy neovim configs
-          if [ -d dotfiles-sync/nvim/.config/nvim ]; then
-            mkdir -p files/home/.config/nvim
-            # Use rsync to handle hidden files and empty directories
-            rsync -a dotfiles-sync/nvim/.config/nvim/ files/home/.config/nvim/
-          fi
-          
-          # Copy git configs
-          if [ -f dotfiles-sync/git/.gitconfig ]; then
-            cp dotfiles-sync/git/.gitconfig files/home/.gitconfig
-          fi
-          
-          # Copy tmux config
-          if [ -f dotfiles-sync/tmux/.tmux.conf ]; then
-            cp dotfiles-sync/tmux/.tmux.conf files/home/.tmux.conf
-          fi
-          
-          # Copy vim config
-          if [ -f dotfiles-sync/vim/.vimrc ]; then
-            cp dotfiles-sync/vim/.vimrc files/home/.vimrc
+          set -eo pipefail
+
+          mkdir -p files/home
+
+          copied_any=false
+
+          while IFS= read -r -d '' source; do
+            category="${source#dotfiles-sync/}"
+
+            case "$category" in
+              .git|.github)
+                continue
+                ;;
+            esac
+
+            echo "Syncing $category configs"
+            rsync -a "$source"/ files/home/
+            copied_any=true
+          done < <(find dotfiles-sync -mindepth 1 -maxdepth 1 -type d -print0)
+
+          if [ "$copied_any" = false ]; then
+            echo "No configuration directories found in dotfiles repository"
           fi
           
       - name: Check for changes
