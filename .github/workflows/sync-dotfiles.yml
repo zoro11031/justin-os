@@ -56,6 +56,7 @@ jobs:
               if [[ "$category" == .* ]]; then
                 dest_prefix="$category"
                 rsync_dest="files/home/"
+                # For dot-directories, omit trailing slash so rsync copies the directory itself (including its name) into the destination.
                 rsync_source="$source"
               else
                 dest_prefix=""
