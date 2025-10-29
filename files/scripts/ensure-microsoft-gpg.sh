@@ -7,6 +7,8 @@ TMP_KEY="$(mktemp)"
 RETRIES="${MICROSOFT_KEY_RETRIES:-5}"
 SLEEP_SECONDS="${MICROSOFT_KEY_SLEEP_SECONDS:-5}"
 EXPECTED_FINGERPRINT="BC528686B50D79E339D3721CEB3E94ADBE1229CF"
+SHORT_KEY_ID="${EXPECTED_FINGERPRINT:24:8}"
+SHORT_KEY_ID_LOWER="${SHORT_KEY_ID,,}"
 FALLBACK_TMP=""
 
 FALLBACK_KEY=$(cat <<'EOF'
@@ -45,6 +47,23 @@ fingerprint_for() {
   gpg --with-colons --show-keys "$key_file" | awk -F: '/^fpr:/ {print toupper($10); exit}'
 }
 
+ensure_key_file_matches() {
+  local key_file="$1"
+
+  if [[ ! -f "$key_file" ]]; then
+    return 1
+  fi
+
+  local fingerprint
+  fingerprint="$(fingerprint_for "$key_file")"
+
+  if [[ -z "$fingerprint" ]]; then
+    return 1
+  fi
+
+  [[ "$fingerprint" == "$EXPECTED_FINGERPRINT" ]]
+}
+
 install_key_from() {
   local source_file="$1"
   local fingerprint
@@ -64,10 +83,15 @@ install_key_from() {
   rpm --import "$KEY_PATH"
 }
 
-# Short key ID for Microsoft packages: EB3E94ADBE1229CF
-if rpm -qa gpg-pubkey | grep -qi 'eb3e94ad'; then
-  echo "Microsoft GPG key already installed; skipping download."
-  exit 0
+# SHORT_KEY_ID is sliced from EXPECTED_FINGERPRINT to capture the Microsoft
+# RPM GPG key's short identifier (lower 32 bits) used by rpm -qa output.
+if rpm -qa gpg-pubkey | grep -qi "$SHORT_KEY_ID_LOWER"; then
+  if ensure_key_file_matches "$KEY_PATH"; then
+    echo "Microsoft GPG key already installed; skipping download."
+    exit 0
+  fi
+
+  echo "Microsoft GPG key present but ${KEY_PATH} missing or outdated; reinstalling." >&2
 fi
 
 attempt=1
@@ -85,8 +109,17 @@ while (( attempt <= RETRIES )); do
 done
 echo "All download attempts failed; using embedded Microsoft GPG key fallback." >&2
 
-FALLBACK_TMP="$(mktemp)"
-printf '%s' "$FALLBACK_KEY" >"$FALLBACK_TMP"
+if [[ -z "$FALLBACK_TMP" ]]; then
+  if ! FALLBACK_TMP="$(mktemp)"; then
+    echo "ERROR: Unable to create temporary file for embedded Microsoft GPG key." >&2
+    exit 1
+  fi
+fi
+
+if ! printf '%s' "$FALLBACK_KEY" >"$FALLBACK_TMP"; then
+  echo "ERROR: Unable to write embedded Microsoft GPG key to temporary file." >&2
+  exit 1
+fi
 
 if install_key_from "$FALLBACK_TMP"; then
   echo "Microsoft GPG key installed from embedded fallback." >&2
