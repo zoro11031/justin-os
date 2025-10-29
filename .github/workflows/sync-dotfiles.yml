@@ -53,6 +53,16 @@ jobs:
             fi
 
             if [ -d "$source" ]; then
+              if [[ "$category" == .* ]]; then
+                dest_prefix="$category"
+                rsync_dest="files/home/"
+                rsync_source="$source"
+              else
+                dest_prefix=""
+                rsync_dest="files/home/"
+                rsync_source="$source/"
+              fi
+
               echo "Syncing configs from $category"
 
               while IFS= read -r -d '' file; do
@@ -62,15 +72,21 @@ jobs:
                   continue
                 fi
 
-                if [[ -n "${seen_paths[$rel_path]}" ]]; then
-                  echo "Error: path '$rel_path' provided by '$category' also exists in '${seen_paths[$rel_path]}'" >&2
+                if [ -n "$dest_prefix" ]; then
+                  final_path="$dest_prefix/$rel_path"
+                else
+                  final_path="$rel_path"
+                fi
+
+                if [[ -n "${seen_paths[$final_path]}" ]]; then
+                  echo "Error: path '$final_path' provided by '$category' also exists in '${seen_paths[$final_path]}'" >&2
                   exit 1
                 fi
 
-                seen_paths[$rel_path]="$category"
+                seen_paths[$final_path]="$category"
               done < <(find "$source" -mindepth 1 \( -type f -o -type l \) -print0)
 
-              if output=$(rsync -a --itemize-changes "$source"/ files/home/); then
+              if output=$(rsync -a --itemize-changes "$rsync_source" "$rsync_dest"); then
                 if [ -n "$output" ]; then
                   echo "$output" | sed 's/^/  /'
                 else
