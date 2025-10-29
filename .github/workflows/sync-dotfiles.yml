@@ -106,6 +106,7 @@ jobs:
 
               echo "Copying file $category"
               dest_dir="files/home/$(dirname -- "$rel_path")"
+              # If dirname returns '.', this creates files/home/.; remove trailing '/.' to get files/home/
               dest_dir="${dest_dir%/.}"
               mkdir -p "$dest_dir"
               cp -a "$source" "files/home/$rel_path"
