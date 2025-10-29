@@ -7,8 +7,9 @@ TMP_KEY="$(mktemp)"
 RETRIES="${MICROSOFT_KEY_RETRIES:-5}"
 SLEEP_SECONDS="${MICROSOFT_KEY_SLEEP_SECONDS:-5}"
 EXPECTED_FINGERPRINT="BC528686B50D79E339D3721CEB3E94ADBE1229CF"
-SHORT_KEY_ID="${EXPECTED_FINGERPRINT:24:8}"
-SHORT_KEY_ID_LOWER="${SHORT_KEY_ID,,}"
+LONG_KEY_ID="${EXPECTED_FINGERPRINT: -16}"
+RPM_PACKAGE_KEY_ID="${LONG_KEY_ID:0:8}"
+RPM_PACKAGE_KEY_ID_LOWER="${RPM_PACKAGE_KEY_ID,,}"
 FALLBACK_TMP=""
 
 FALLBACK_KEY=$(cat <<'EOF'
@@ -83,9 +84,10 @@ install_key_from() {
   rpm --import "$KEY_PATH"
 }
 
-# SHORT_KEY_ID is sliced from EXPECTED_FINGERPRINT to capture the Microsoft
-# RPM GPG key's short identifier (lower 32 bits) used by rpm -qa output.
-if rpm -qa gpg-pubkey | grep -qi "$SHORT_KEY_ID_LOWER"; then
+# RPM stores imported keys as pseudo-packages named gpg-pubkey-<keyid> where
+# <keyid> is the first 8 hex characters of the long (64-bit) key identifier.
+# Deriving the value from the fingerprint keeps the expectation centralized.
+if rpm -qa gpg-pubkey | grep -qi "$RPM_PACKAGE_KEY_ID_LOWER"; then
   if ensure_key_file_matches "$KEY_PATH"; then
     echo "Microsoft GPG key already installed; skipping download."
     exit 0
@@ -109,11 +111,9 @@ while (( attempt <= RETRIES )); do
 done
 echo "All download attempts failed; using embedded Microsoft GPG key fallback." >&2
 
-if [[ -z "$FALLBACK_TMP" ]]; then
-  if ! FALLBACK_TMP="$(mktemp)"; then
-    echo "ERROR: Unable to create temporary file for embedded Microsoft GPG key." >&2
-    exit 1
-  fi
+if ! FALLBACK_TMP="$(mktemp)"; then
+  echo "ERROR: Unable to create temporary file for embedded Microsoft GPG key." >&2
+  exit 1
 fi
 
 if ! printf '%s' "$FALLBACK_KEY" >"$FALLBACK_TMP"; then
