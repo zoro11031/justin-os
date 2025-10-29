@@ -44,10 +44,19 @@ trap cleanup EXIT
 
 # Returns the uppercase fingerprint for the given key file. A blank result
 # means gpg could not parse the file, indicating an invalid key payload or a
-# tooling failure upstream.
+# tooling failure upstream. If gpg itself fails (e.g., not installed), an error
+# is emitted and the helper returns non-zero so callers can surface the
+# tooling issue distinctly.
 fingerprint_for() {
   local key_file="$1"
-  gpg --with-colons --show-keys "$key_file" | awk -F: '/^fpr:/ {print toupper($10); exit}'
+  local gpg_output
+
+  if ! gpg_output="$(gpg --with-colons --show-keys "$key_file" 2>/dev/null)"; then
+    echo "gpg failed to inspect $key_file" >&2
+    return 1
+  fi
+
+  awk -F: '/^fpr:/ {print toupper($10); exit}' <<<"$gpg_output"
 }
 
 ensure_key_file_matches() {
@@ -58,7 +67,10 @@ ensure_key_file_matches() {
   fi
 
   local fingerprint
-  fingerprint="$(fingerprint_for "$key_file")"
+
+  if ! fingerprint=$(fingerprint_for "$key_file"); then
+    return 1
+  fi
 
   if [[ -z "$fingerprint" ]]; then
     echo "Unable to read fingerprint from $key_file" >&2
@@ -71,7 +83,10 @@ ensure_key_file_matches() {
 install_key_from() {
   local source_file="$1"
   local fingerprint
-  fingerprint="$(fingerprint_for "$source_file")"
+
+  if ! fingerprint=$(fingerprint_for "$source_file"); then
+    return 1
+  fi
 
   if [[ -z "$fingerprint" ]]; then
     echo "Unable to read fingerprint from $source_file" >&2
@@ -83,7 +98,11 @@ install_key_from() {
     return 1
   fi
 
-  install -Dm0644 "$source_file" "$KEY_PATH"
+  local key_dir
+  key_dir="$(dirname "$KEY_PATH")"
+
+  install -d -m0755 "$key_dir"
+  install -m0644 "$source_file" "$KEY_PATH"
   rpm --import "$KEY_PATH"
 }
 
@@ -101,7 +120,8 @@ fi
 
 attempt=1
 while (( attempt <= RETRIES )); do
-  if curl -fsSL "$KEY_URL" -o "$TMP_KEY" && install_key_from "$TMP_KEY"; then
+  if curl --connect-timeout 10 --max-time 60 -fsSL "$KEY_URL" -o "$TMP_KEY" \
+      && install_key_from "$TMP_KEY"; then
     echo "Microsoft GPG key installed successfully."
     exit 0
   fi
