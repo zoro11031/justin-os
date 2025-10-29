@@ -2,7 +2,8 @@ modules:
   # Microsoft VS Code repository setup
   - type: rpm-ostree
     repos:
-      - https://packages.microsoft.com/yumrepos/vscode
+      # Official instructions: https://code.visualstudio.com/docs/setup/linux
+      - https://packages.microsoft.com/yumrepos/vscode/microsoft-vscode.repo
     keys:
       - https://packages.microsoft.com/keys/microsoft.asc
     install:
