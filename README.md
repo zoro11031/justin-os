@@ -27,7 +27,7 @@ All users will use zsh as their default interactive shell.
 - Optimized completion caching
 
 **Development Tools**
-Development languages, editors and CLI tooling (Go, Python, Node.js, VS Code, linters, etc.) are no longer installed system-wide. Instead, this repository provides a recommended Fedora distrobox container workflow so you can keep the host image minimal and run all developer tooling inside an isolated Fedora container. See `docs/DEV_IN_CONTAINER.md` and `scripts/setup-fedora-distrobox.sh` for a quick setup script and instructions.
+Development languages, editors and CLI tooling (Go, Python, Node.js, VS Code, linters, etc.) are no longer installed system-wide. Instead, this repository provides a comprehensive Fedora distrobox setup script that creates a fully-configured development container with all essential tools. The container uses Universal Blue's official `ghcr.io/ublue-os/fedora-toolbox:latest` image and includes: Python, Node.js, Go, Rust, VS Code (from Microsoft's COPR), fzf, zoxide, and modern CLI utilities. See `docs/DEV_IN_CONTAINER.md` for details. After installation, the setup script is available at `~/Documents/justin-os-scripts/setup-fedora-distrobox.sh`.
 
 **Repositories**  
 RPM Fusion (free and nonfree) pre-configured. Surface variant adds linux-surface repo.

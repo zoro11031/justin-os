@@ -63,10 +63,11 @@ modules:
       - xorg-x11-font-utils # Required by msttcore-fonts-installer
       - fontconfig
 
-  # Configure shells and install Microsoft fonts (BEFORE changing /bin/sh)
+  # Configure shells and install fonts (BEFORE changing /bin/sh)
   - type: script
     scripts:
       - install-ms-fonts-build.sh
+      - install-nerd-fonts-build.sh
       - set-default-shell-zsh.sh
 
   - type: signing

@@ -125,11 +125,25 @@ distrobox create \
 
 success "Container '${CONTAINER_NAME}' created successfully!"
 
-# Generate setup script to run inside the container
-SETUP_SCRIPT=$(mktemp)
-cat > "${SETUP_SCRIPT}" << 'INNER_SCRIPT'
+# Run the setup script inside the container
+info "Running setup inside the container..."
+distrobox enter "${CONTAINER_NAME}" -- env \
+    INSTALL_VSCODE="${INSTALL_VSCODE}" \
+    INSTALL_MINIMAL="${INSTALL_MINIMAL}" \
+    CONTAINER_NAME="${CONTAINER_NAME}" \
+    bash <<'INNER_SCRIPT'
 #!/bin/bash
 set -euo pipefail
+
+INSTALL_VSCODE="${INSTALL_VSCODE:-true}"
+INSTALL_MINIMAL="${INSTALL_MINIMAL:-false}"
+
+# Normalize booleans for comparison
+to_lower() {
+    printf '%s' "$1" | tr '[:upper:]' '[:lower:]'
+}
+INSTALL_VSCODE="$(to_lower "${INSTALL_VSCODE}")"
+INSTALL_MINIMAL="$(to_lower "${INSTALL_MINIMAL}")"
 
 # Colors for output
 RED='\033[0;31m'
@@ -142,6 +156,46 @@ info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 error() { echo -e "${RED}[ERROR]${NC} $1"; }
+
+BASHRC="${HOME}/.bashrc"
+touch "${BASHRC}"
+
+append_line_to_bashrc() {
+    local line="$1"
+    if ! grep -Fqx "$line" "${BASHRC}"; then
+        echo "$line" >> "${BASHRC}"
+    fi
+}
+
+append_block_to_bashrc() {
+    local marker="$1"
+    local closing="${marker//>>>/<<<}"
+    if ! grep -Fq "$marker" "${BASHRC}"; then
+        {
+            echo ""
+            echo "$marker"
+            cat
+            echo "$closing"
+        } >> "${BASHRC}"
+    else
+        # Consume stdin so heredoc does not leak to terminal
+        cat > /dev/null
+    fi
+}
+
+ensure_path_prefix() {
+    local dir="$1"
+    if [[ -d "$dir" && ":${PATH}:" != *":${dir}:"* ]]; then
+        PATH="${dir}:${PATH}"
+    fi
+}
+
+ensure_path_suffix() {
+    local dir="$1"
+    if [[ -d "$dir" && ":${PATH}:" != *":${dir}:"* ]]; then
+        PATH="${PATH}:${dir}"
+    fi
+}
 
 info "Updating system packages..."
 sudo dnf update -y
@@ -156,6 +210,7 @@ sudo dnf install -y \
     autoconf \
     libtool \
     pkg-config \
+    dnf-plugins-core \
     git \
     git-lfs \
     curl \
@@ -215,12 +270,23 @@ if [[ "${INSTALL_MINIMAL}" != "true" ]]; then
         python3-virtualenv \
         pipx
 
-    # Install common Python tools via pipx
-    pipx install poetry
-    pipx install black
-    pipx install ruff
-    pipx install mypy
-    pipx install pylint
+    pipx ensurepath
+    mkdir -p "${HOME}/.local/bin"
+    ensure_path_prefix "${HOME}/.local/bin"
+    export PATH
+
+    # Install common Python tools via pipx (idempotent)
+    PYTHON_TOOLS=(
+        poetry
+        black
+        ruff
+        mypy
+        pylint
+    )
+
+    for tool in "${PYTHON_TOOLS[@]}"; do
+        pipx install --force "$tool"
+    done
     success "Python environment installed!"
 
     # Node.js and npm
@@ -228,18 +294,14 @@ if [[ "${INSTALL_MINIMAL}" != "true" ]]; then
     sudo dnf install -y nodejs npm
 
     # Install common global npm packages
-    npm config set prefix ~/.npm-global
-    echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
-    export PATH=~/.npm-global/bin:$PATH
+    NPM_PREFIX="${HOME}/.npm-global"
+    mkdir -p "${NPM_PREFIX}"
+    npm config set prefix "${NPM_PREFIX}"
+    append_line_to_bashrc 'export PATH="$HOME/.npm-global/bin:$PATH"'
+    ensure_path_prefix "${NPM_PREFIX}/bin"
+    export PATH
 
-    npm install -g \
-        yarn \
-        pnpm \
-        typescript \
-        ts-node \
-        eslint \
-        prettier \
-        npm-check-updates
+    npm install -g yarn pnpm typescript ts-node eslint prettier npm-check-updates
     success "Node.js and npm installed!"
 
     # Go
@@ -248,10 +310,11 @@ if [[ "${INSTALL_MINIMAL}" != "true" ]]; then
 
     # Setup Go environment
     mkdir -p ~/go/{bin,src,pkg}
-    echo 'export GOPATH=$HOME/go' >> ~/.bashrc
-    echo 'export PATH=$PATH:$GOPATH/bin' >> ~/.bashrc
-    export GOPATH=$HOME/go
-    export PATH=$PATH:$GOPATH/bin
+    append_line_to_bashrc 'export GOPATH="$HOME/go"'
+    append_line_to_bashrc 'export PATH="$PATH:$GOPATH/bin"'
+    export GOPATH="$HOME/go"
+    ensure_path_suffix "${GOPATH}/bin"
+    export PATH
 
     # Install common Go tools
     go install golang.org/x/tools/gopls@latest
@@ -264,7 +327,7 @@ if [[ "${INSTALL_MINIMAL}" != "true" ]]; then
     if ! command -v rustc &> /dev/null; then
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
         source "$HOME/.cargo/env"
-        echo 'source "$HOME/.cargo/env"' >> ~/.bashrc
+        append_line_to_bashrc 'source "$HOME/.cargo/env"'
 
         # Install common Rust tools
         cargo install cargo-edit
@@ -276,8 +339,10 @@ if [[ "${INSTALL_MINIMAL}" != "true" ]]; then
 
     # Additional development tools
     info "Installing additional development tools..."
+    if ! sudo dnf install -y docker-ce-cli; then
+        warn "docker-ce-cli not available in current repos, skipping."
+    fi
     sudo dnf install -y \
-        docker-ce-cli \
         podman-compose \
         lazygit \
         gh \
@@ -304,14 +369,19 @@ if [[ "${INSTALL_VSCODE}" == "true" ]]; then
 
     info "Installing common VS Code extensions..."
     # Install common extensions
-    code --install-extension ms-python.python
-    code --install-extension golang.go
-    code --install-extension rust-lang.rust-analyzer
-    code --install-extension dbaeumer.vscode-eslint
-    code --install-extension esbenp.prettier-vscode
-    code --install-extension eamodio.gitlens
-    code --install-extension ms-vscode.cmake-tools
-    code --install-extension ms-vscode.cpptools
+    CODE_EXTENSIONS=(
+        ms-python.python
+        golang.go
+        rust-lang.rust-analyzer
+        dbaeumer.vscode-eslint
+        esbenp.prettier-vscode
+        eamodio.gitlens
+        ms-vscode.cmake-tools
+        ms-vscode.cpptools
+    )
+    for extension in "${CODE_EXTENSIONS[@]}"; do
+        code --install-extension "$extension" || warn "Failed to install VS Code extension ${extension}"
+    done
     success "VS Code extensions installed!"
 fi
 
@@ -320,15 +390,14 @@ info "Configuring shell integrations..."
 
 # Add fzf key bindings and completion
 if [ -f /usr/share/fzf/shell/key-bindings.bash ]; then
-    echo 'source /usr/share/fzf/shell/key-bindings.bash' >> ~/.bashrc
+    append_line_to_bashrc 'source /usr/share/fzf/shell/key-bindings.bash'
 fi
 
 # Add zoxide init
-echo 'eval "$(zoxide init bash)"' >> ~/.bashrc
+append_line_to_bashrc 'eval "$(zoxide init bash)"'
 
 # Add useful aliases
-cat >> ~/.bashrc << 'EOF'
-
+append_block_to_bashrc "# >>> justin-os dev aliases >>>" <<'EOF'
 # Development aliases
 alias g='git'
 alias dc='docker-compose'
@@ -349,7 +418,6 @@ alias cd='z'  # zoxide
 alias py='python3'
 alias pip='pip3'
 alias venv='python3 -m venv'
-
 EOF
 
 success "Shell integrations configured!"
@@ -387,21 +455,6 @@ info "Use 'z <directory>' instead of 'cd' for faster navigation with zoxide"
 info "Use Ctrl+R for fzf history search"
 
 INNER_SCRIPT
-
-# Make the script executable
-chmod +x "${SETUP_SCRIPT}"
-
-# Run the setup script inside the container
-info "Running setup inside the container..."
-distrobox enter "${CONTAINER_NAME}" -- bash -c "
-export INSTALL_VSCODE='${INSTALL_VSCODE}'
-export INSTALL_MINIMAL='${INSTALL_MINIMAL}'
-export CONTAINER_NAME='${CONTAINER_NAME}'
-$(cat "${SETUP_SCRIPT}")
-"
-
-# Clean up temporary script
-rm -f "${SETUP_SCRIPT}"
 
 success "======================================"
 success "Setup completed successfully!"

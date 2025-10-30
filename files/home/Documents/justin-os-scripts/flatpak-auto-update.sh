@@ -5,6 +5,11 @@
 
 set -e
 
+if ! command -v flatpak >/dev/null 2>&1; then
+    echo "flatpak command not found. Aborting." >&2
+    exit 1
+fi
+
 echo "=========================================="
 echo "Flatpak Auto-Update: $(date)"
 echo "=========================================="

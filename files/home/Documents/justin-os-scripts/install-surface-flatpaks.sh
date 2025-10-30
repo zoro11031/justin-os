@@ -7,6 +7,22 @@ set -e
 
 STAMP_FILE="/var/lib/justin-os/surface-flatpaks-installed"
 
+# Ensure required tools are available
+if ! command -v flatpak >/dev/null 2>&1; then
+    echo "flatpak command not found. Aborting." >&2
+    exit 1
+fi
+
+if ! command -v jq >/dev/null 2>&1; then
+    echo "jq command not found. Aborting." >&2
+    exit 1
+fi
+
+if ! command -v rpm-ostree >/dev/null 2>&1; then
+    echo "rpm-ostree command not found. Aborting." >&2
+    exit 1
+fi
+
 # Check if already run for this deployment
 if [ -f "$STAMP_FILE" ]; then
     CURRENT_DEPLOYMENT=$(rpm-ostree status --json | jq -r '.deployments[0].checksum')
