@@ -67,6 +67,9 @@ modules:
       # docs/DEV_IN_CONTAINER.md for setup and a convenience script in
       # scripts/setup-fedora-distrobox.sh.
       - libguestfs
+      - docker
+      - docker-compose
+      - git
 
   # Enable virtualization and container services
   - type: systemd
