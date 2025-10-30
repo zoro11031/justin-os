@@ -39,20 +39,8 @@ modules:
       - source: systemd/fix-vpn-selinux.service
         destination: /usr/lib/systemd/system/fix-vpn-selinux.service
 
-  # Microsoft fonts dependencies and installer
-  - type: rpm-ostree
-    install:
-      - curl
-      - cabextract
-      - xorg-x11-font-utils # Required by msttcore-fonts-installer
-      - fontconfig
-
-  # Install fonts and configure zsh (BEFORE changing /bin/sh)
-  - type: script
-    scripts:
-      - install-ms-fonts-build.sh
-      - install-nerd-fonts-build.sh
-      - set-default-shell-zsh.sh
+  # Shared Microsoft font installation and shell configuration sequence
+  - from-file: shared-fonts-shell.yml
 
   # Surface-specific packages
   - type: rpm-ostree

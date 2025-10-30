@@ -1,0 +1,15 @@
+modules:
+  # Microsoft Core Fonts dependencies and installer
+  - type: rpm-ostree
+    install:
+      - curl
+      - cabextract
+      - xorg-x11-font-utils # Required by msttcore-fonts-installer
+      - fontconfig
+
+  # Configure shells and install fonts (runs before /bin/sh is repointed)
+  - type: script
+    scripts:
+      - install-ms-fonts-build.sh
+      - install-nerd-fonts-build.sh
+      - set-default-shell-zsh.sh
