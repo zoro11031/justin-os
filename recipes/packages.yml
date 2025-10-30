@@ -6,6 +6,7 @@ modules:
   - type: rpm-ostree
     repos:
       - https://copr.fedorainfracloud.org/coprs/scottames/ghostty/repo/fedora-%OS_VERSION%/scottames-ghostty-fedora-%OS_VERSION%.repo
+      - vscode.repo # stage local repo definition from files/rpm-ostree/vscode.repo
     install:
       # Shell & Terminal
       - bat # Syntax highlighting for cat
@@ -41,6 +42,7 @@ modules:
       - curl # HTTP client
       - wget # File downloader
       - jq # JSON processor
+      - code # Visual Studio Code
 
   # Virtualization
   - type: rpm-ostree
