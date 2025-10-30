@@ -51,14 +51,14 @@ download_with_retry() {
   return 1
 }
 
-TMPDIR="$(mktemp -d)"
+TMP_WORKDIR="$(mktemp -d)"
 cleanup() {
-  rm -rf "${TMPDIR}"
+  rm -rf "${TMP_WORKDIR}"
 }
 trap cleanup EXIT
 
-FREE_RPM="${TMPDIR}/rpmfusion-free-release.rpm"
-NONFREE_RPM="${TMPDIR}/rpmfusion-nonfree-release.rpm"
+FREE_RPM="${TMP_WORKDIR}/rpmfusion-free-release.rpm"
+NONFREE_RPM="${TMP_WORKDIR}/rpmfusion-nonfree-release.rpm"
 
 download_with_retry "${FREE_RPM}" "${URLs[free_primary]}" "${URLs[free_fallback]}"
 download_with_retry "${NONFREE_RPM}" "${URLs[nonfree_primary]}" "${URLs[nonfree_fallback]}"
