@@ -60,7 +60,13 @@ trap cleanup EXIT
 FREE_RPM="${TMP_WORKDIR}/rpmfusion-free-release.rpm"
 NONFREE_RPM="${TMP_WORKDIR}/rpmfusion-nonfree-release.rpm"
 
-download_with_retry "${FREE_RPM}" "${URLs[free_primary]}" "${URLs[free_fallback]}"
-download_with_retry "${NONFREE_RPM}" "${URLs[nonfree_primary]}" "${URLs[nonfree_fallback]}"
+if ! download_with_retry "${FREE_RPM}" "${URLs[free_primary]}" "${URLs[free_fallback]}"; then
+  echo "Failed to download RPM Fusion FREE repository release package." >&2
+  exit 1
+fi
 
+if ! download_with_retry "${NONFREE_RPM}" "${URLs[nonfree_primary]}" "${URLs[nonfree_fallback]}"; then
+  echo "Failed to download RPM Fusion NONFREE repository release package." >&2
+  exit 1
+fi
 rpm-ostree install "${FREE_RPM}" "${NONFREE_RPM}"
