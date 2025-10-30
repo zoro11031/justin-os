@@ -41,7 +41,7 @@ download_with_retry() {
   local url
 
   for url in "$@"; do
-    if curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" -fL -o "${destination}" "${url}"; then
+    if curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" --connect-timeout 10 --max-time 60 -fL -o "${destination}" "${url}"; then
       return 0
     fi
     echo "Download failed for ${url}, trying next mirror if available..." >&2
