@@ -31,6 +31,14 @@ if ! command -v semanage >/dev/null 2>&1; then
             chcon -R -t home_cert_t "$homedir/.cert" 2>/dev/null || true
             echo "Applied temporary SELinux fix to $homedir/.cert"
         fi
+        
+        # Also handle NetworkManager certificate store used by Plasma
+        nm_cert_path="$homedir/.local/share/networkmanagement/certificates/nm-openvpn"
+        if [ -d "$nm_cert_path" ]; then
+            echo "Processing $nm_cert_path"
+            chcon -R -t home_cert_t "$nm_cert_path" 2>/dev/null || true
+            echo "Applied temporary SELinux fix to $nm_cert_path"
+        fi
     done
     exit 0
 fi
@@ -62,6 +70,24 @@ for homedir in /var/home/*; do
             restorecon -Rv "$cert_path" 2>/dev/null || true
             echo "✓ Fixed SELinux context for $username's VPN certificates"
         fi
+        
+        # Also handle NetworkManager certificate store used by Plasma
+        nm_cert_path="$homedir/.local/share/networkmanagement/certificates/nm-openvpn"
+        if [ -d "$nm_cert_path" ]; then
+            echo "Processing $nm_cert_path"
+            echo "Adding SELinux rule for $nm_cert_path"
+            
+            # Try to add, if it exists, modify it
+            if semanage fcontext -l | grep -q "^${nm_cert_path}"; then
+                semanage fcontext -m -t home_cert_t "${nm_cert_path}(/.*)?" 2>/dev/null || true
+            else
+                semanage fcontext -a -t home_cert_t "${nm_cert_path}(/.*)?" 2>/dev/null || true
+            fi
+            
+            # Apply the context
+            restorecon -Rv "$nm_cert_path" 2>/dev/null || true
+            echo "✓ Fixed SELinux context for $username's NetworkManager VPN certificates"
+        fi
     fi
 done
 
@@ -75,6 +101,18 @@ if semanage fcontext -l | grep -q "/var/home/\["; then
     semanage fcontext -m -t home_cert_t "$GENERAL_RULE" 2>/dev/null || true
 else
     semanage fcontext -a -t home_cert_t "$GENERAL_RULE" 2>/dev/null || true
+fi
+
+# Also set a general rule for NetworkManager certificate directories
+echo "Adding general SELinux rule for NetworkManager certificate directories"
+NM_GENERAL_RULE="/var/home/[^/]+/.local/share/networkmanagement/certificates/nm-openvpn(/.*)?"
+
+# Check if NetworkManager general rule already exists
+if semanage fcontext -l | grep -q "/var/home/\[.*networkmanagement"; then
+    echo "NetworkManager general rule already exists, updating..."
+    semanage fcontext -m -t home_cert_t "$NM_GENERAL_RULE" 2>/dev/null || true
+else
+    semanage fcontext -a -t home_cert_t "$NM_GENERAL_RULE" 2>/dev/null || true
 fi
 
 echo "SELinux VPN certificate fix complete and permanent!"
