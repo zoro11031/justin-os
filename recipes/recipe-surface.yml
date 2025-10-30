@@ -36,6 +36,7 @@ modules:
     files:
       - source: scripts/fix-vpn-selinux.sh
         destination: /usr/bin/fix-vpn-selinux.sh
+        mode: '0755'
       - source: systemd/fix-vpn-selinux.service
         destination: /usr/lib/systemd/system/fix-vpn-selinux.service
 

@@ -25,8 +25,9 @@ if ! command -v semanage >/dev/null 2>&1; then
     for homedir in /var/home/*; do
         # Skip if glob didn't match anything
         [ -e "$homedir" ] || continue
-        
+
         if [ -d "$homedir/.cert" ]; then
+            echo "Processing $homedir/.cert"
             chcon -R -t home_cert_t "$homedir/.cert" 2>/dev/null || true
             echo "Applied temporary SELinux fix to $homedir/.cert"
         fi
@@ -47,6 +48,7 @@ for homedir in /var/home/*; do
         
         # Add SELinux file context rule if .cert directory exists
         if [ -d "$cert_path" ]; then
+            echo "Processing $cert_path"
             echo "Adding SELinux rule for $cert_path"
             
             # Try to add, if it exists, modify it
