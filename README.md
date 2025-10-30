@@ -61,7 +61,7 @@ Systemd services handle Flatpaks after each new deployment:
 
 - `flatpak-auto-update.timer` → runs weekly to update both user and system scopes; exits quietly if offline.
 
-If Flatpak provisioning misses anything after a deploy, reapply the catalog directly with BlueBuild:
+If Flatpak provisioning misses anything after a deploy, you can reapply the catalog of Flatpak applications directly with BlueBuild. The "catalog" refers to the list of Flatpak apps defined in the BlueBuild configuration file (typically `bluebuild-flatpak-recipe.yml` in the project root). Running the command below will install or update all applications specified in that recipe:
 
 ```bash
 bluebuild-flatpak-manager apply all
