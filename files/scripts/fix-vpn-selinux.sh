@@ -68,7 +68,8 @@ echo "Adding general SELinux rule for all /var/home/*/.cert directories"
 GENERAL_RULE="/var/home/[^/]+/.cert(/.*)?"
 
 # Check if general rule already exists
-if semanage fcontext -l | grep -q "/var/home/\["; then
+# Use fixed-string matching so the regex metacharacters stay literal
+if semanage fcontext -l | grep -Fq "$GENERAL_RULE"; then
     echo "General rule already exists, updating..."
     semanage fcontext -m -t home_cert_t "$GENERAL_RULE" 2>/dev/null || true
 else
