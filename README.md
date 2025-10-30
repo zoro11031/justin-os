@@ -59,7 +59,6 @@ The script creates (or replaces) a distrobox using `ghcr.io/ublue-os/fedora-tool
 
 Systemd services handle Flatpaks after each new deployment:
 
-- `install-surface-flatpaks.service` (Surface image) → adds touch/stylus apps with its own stamp file.
 - `flatpak-auto-update.timer` → runs weekly to update both user and system scopes; exits quietly if offline.
 
 If Flatpak provisioning misses anything after a deploy, reapply the catalog directly with BlueBuild:
