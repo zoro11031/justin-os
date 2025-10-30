@@ -45,6 +45,11 @@ modules:
           - org.gnome.Loupe
       - scope: user
 
+  # Ensure the Microsoft GPG key is present before repo configuration
+  - type: script
+    scripts:
+      - ensure-microsoft-gpg.sh
+
   # Import consolidated modules
   - from-file: packages.yml
   - from-file: system-services.yml
