@@ -63,4 +63,4 @@ NONFREE_RPM="${TMPDIR}/rpmfusion-nonfree-release.rpm"
 download_with_retry "${FREE_RPM}" "${URLs[free_primary]}" "${URLs[free_fallback]}"
 download_with_retry "${NONFREE_RPM}" "${URLs[nonfree_primary]}" "${URLs[nonfree_fallback]}"
 
-rpm-ostree install "${FREE_RPM}" "${NONFREE_RPM}"
+rpm-ostree install -y --idempotent "${FREE_RPM}" "${NONFREE_RPM}"
