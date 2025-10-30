@@ -67,7 +67,7 @@ If Flatpak provisioning misses anything after a deploy, you can reapply the cata
 bluebuild-flatpak-manager apply all
 ```
 
-Additional helpers live in `~/Documents/justin-os-scripts/` and exit early if `flatpak`, `jq`, or `rpm-ostree` are missing:
+The `install-surface-flatpaks.sh` helper in `~/Documents/justin-os-scripts/` exits early if `flatpak`, `jq`, or `rpm-ostree` are missing:
 
 ```bash
 bash install-surface-flatpaks.sh
