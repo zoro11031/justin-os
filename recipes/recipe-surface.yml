@@ -17,11 +17,10 @@ modules:
       - source: system
         destination: /
 
-  # Install RPM Fusion repositories
-  - type: rpm-ostree
-    install:
-      - https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-%OS_VERSION%.noarch.rpm
-      - https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-%OS_VERSION%.noarch.rpm
+  # Install RPM Fusion repositories with resilient mirror selection
+  - type: script
+    scripts:
+      - install-rpmfusion-release.sh
 
   # Import shared modules
   - from-file: packages-surface.yml
