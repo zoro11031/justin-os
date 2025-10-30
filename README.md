@@ -42,7 +42,7 @@ Linux-surface kernel for better hardware support, touchscreen firmware (iptsd), 
 
 You need an existing Fedora Atomic install (Silverblue, Kinoite, or any uBlue variant).
 
-### Main Build (KDE) - Fedora 43
+### Main Build (KDE) - Fedora 42
 
 First rebase to unsigned image:
 
@@ -55,19 +55,6 @@ After reboot, switch to signed:
 
 ```bash
 rpm-ostree rebase ostree-image-signed:docker://ghcr.io/zoro11031/justin-os:latest
-systemctl reboot
-```
-
-### Main Build (KDE) - Fedora 42
-
-For Fedora 42 compatibility, use the `br-fedora-42-42` tag:
-
-```bash
-rpm-ostree rebase ostree-unverified-registry:ghcr.io/zoro11031/justin-os:br-fedora-42-42
-systemctl reboot
-
-# After reboot:
-rpm-ostree rebase ostree-image-signed:docker://ghcr.io/zoro11031/justin-os:br-fedora-42-42
 systemctl reboot
 ```
 
@@ -206,7 +193,7 @@ Flatpaks are installed via the default-flatpaks module during the image build. I
 
 The `justin-os-surface` variant includes:
 
-- **Base**: Fedora 42 (the Surface build requires the linux-surface kernel, which is not yet available for Fedora 43; will upgrade once support is added)
+- **Base**: Fedora 42
 - **Kernel**: kernel-surface, kernel-surface-default-watchdog
 - **Touchscreen**: iptsd (touchscreen firmware)
 - **Hardware**: libwacom-surface, thermald
@@ -260,7 +247,7 @@ Check out the [BlueBuild docs](https://blue-build.org/learn/getting-started/) fo
 **Software:**
 
 - Existing Fedora Atomic installation (Silverblue, Kinoite, or any Universal Blue variant)
-- Fedora 43 (main build) or Fedora 42 (Surface build)
+- Fedora 42 (both main and Surface builds)
 
 **For Surface variant:**
 

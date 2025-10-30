@@ -1,8 +1,0 @@
-# Visual Studio Code repository definition (kept for historical/reference only)
-# NOTE: This system image no longer installs VS Code system-wide. Development
-# tooling is intended to be installed inside a Fedora distrobox container. See
-# docs/DEV_IN_CONTAINER.md and scripts/setup-fedora-distrobox.sh for details.
-
-[code]
-name=Visual Studio Code (disabled)
-enabled=0
