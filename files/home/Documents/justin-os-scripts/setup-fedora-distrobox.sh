@@ -268,18 +268,17 @@ else
     fi
 
     TMP_FONT_DIR="$(mktemp -d)"
+    trap 'rm -rf "${TMP_FONT_DIR}"' EXIT
     FONT_ARCHIVE="${TMP_FONT_DIR}/JetBrainsMono.zip"
     FONT_EXTRACT_DIR="${TMP_FONT_DIR}/JetBrainsMono"
     FONT_INSTALL_DIR="${HOME}/.local/share/fonts/JetBrainsMono-Nerd-Font"
 
     if ! curl -fL "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip" -o "${FONT_ARCHIVE}"; then
         echo -e "${RED}[ERROR]${NC} Failed to download JetBrains Mono Nerd Font archive."
-        rm -rf "${TMP_FONT_DIR}"
         exit 1
     fi
     if ! unzip -q "${FONT_ARCHIVE}" -d "${FONT_EXTRACT_DIR}"; then
         echo -e "${RED}[ERROR]${NC} Failed to extract JetBrains Mono Nerd Font archive. The file may be corrupted."
-        rm -rf "${TMP_FONT_DIR}"
         exit 1
     fi
 
@@ -291,7 +290,6 @@ else
     shopt -u nullglob
 
     fc-cache -f "${HOME}/.local/share/fonts"
-    rm -rf "${TMP_FONT_DIR}"
     success "JetBrains Mono Nerd Font installed!"
 fi
 
