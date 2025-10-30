@@ -272,8 +272,16 @@ else
     FONT_EXTRACT_DIR="${TMP_FONT_DIR}/JetBrainsMono"
     FONT_INSTALL_DIR="${HOME}/.local/share/fonts/JetBrainsMono-Nerd-Font"
 
-    curl -fL "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip" -o "${FONT_ARCHIVE}"
-    unzip -q "${FONT_ARCHIVE}" -d "${FONT_EXTRACT_DIR}"
+    if ! curl -fL "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip" -o "${FONT_ARCHIVE}"; then
+        echo -e "${RED}[ERROR]${NC} Failed to download JetBrains Mono Nerd Font archive."
+        rm -rf "${TMP_FONT_DIR}"
+        exit 1
+    fi
+    if ! unzip -q "${FONT_ARCHIVE}" -d "${FONT_EXTRACT_DIR}"; then
+        echo -e "${RED}[ERROR]${NC} Failed to extract JetBrains Mono Nerd Font archive. The file may be corrupted."
+        rm -rf "${TMP_FONT_DIR}"
+        exit 1
+    fi
 
     mkdir -p "${FONT_INSTALL_DIR}"
     shopt -s nullglob
