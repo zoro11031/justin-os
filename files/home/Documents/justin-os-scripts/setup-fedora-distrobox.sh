@@ -230,14 +230,25 @@ BASE_PACKAGES=(
 
 BASE_PROCESSED=0
 BASE_SKIPPED=0
-for pkg in "${BASE_PACKAGES[@]}"; do
-    if sudo dnf install -y "${pkg}"; then
-        ((BASE_PROCESSED++))
-    else
-        warn "Package '${pkg}' unavailable or failed to install; skipping."
-        ((BASE_SKIPPED++))
-    fi
-done
+# Attempt to install all base packages in one batch
+if sudo dnf install -y "${BASE_PACKAGES[@]}"; then
+    BASE_PROCESSED=${#BASE_PACKAGES[@]}
+    BASE_SKIPPED=0
+else
+    # If batch install fails, check which packages are missing and try to install them individually
+    for pkg in "${BASE_PACKAGES[@]}"; do
+        if rpm -q "${pkg}" &> /dev/null; then
+            ((BASE_PROCESSED++))
+        else
+            if sudo dnf install -y "${pkg}"; then
+                ((BASE_PROCESSED++))
+            else
+                warn "Package '${pkg}' unavailable or failed to install; skipping."
+                ((BASE_SKIPPED++))
+            fi
+        fi
+    done
+fi
 
 if (( BASE_SKIPPED == 0 )); then
     success "Base development tools installed!"
