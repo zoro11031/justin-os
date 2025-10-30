@@ -55,20 +55,8 @@ modules:
   - from-file: system-services.yml
   - from-file: common-flatpaks.yml
 
-  # Microsoft Core Fonts dependencies and installer
-  - type: rpm-ostree
-    install:
-      - curl
-      - cabextract
-      - xorg-x11-font-utils # Required by msttcore-fonts-installer
-      - fontconfig
-
-  # Configure shells and install fonts (BEFORE changing /bin/sh)
-  - type: script
-    scripts:
-      - install-ms-fonts-build.sh
-      - install-nerd-fonts-build.sh
-      - set-default-shell-zsh.sh
+  # Shared Microsoft font installation and shell configuration sequence
+  - from-file: shared-fonts-shell.yml
 
   - type: signing
 
