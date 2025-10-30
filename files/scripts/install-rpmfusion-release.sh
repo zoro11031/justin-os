@@ -41,7 +41,7 @@ download_with_retry() {
   local url
 
   for url in "$@"; do
-    if curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" -fL -o "${destination}" "${url}"; then
+    if curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" --connect-timeout 10 --max-time 60 -fL -o "${destination}" "${url}"; then
       return 0
     fi
     echo "Download failed for ${url}, trying next mirror if available..." >&2
@@ -51,16 +51,22 @@ download_with_retry() {
   return 1
 }
 
-TMPDIR="$(mktemp -d)"
+TMP_WORKDIR="$(mktemp -d)"
 cleanup() {
-  rm -rf "${TMPDIR}"
+  rm -rf "${TMP_WORKDIR}"
 }
 trap cleanup EXIT
 
-FREE_RPM="${TMPDIR}/rpmfusion-free-release.rpm"
-NONFREE_RPM="${TMPDIR}/rpmfusion-nonfree-release.rpm"
+FREE_RPM="${TMP_WORKDIR}/rpmfusion-free-release.rpm"
+NONFREE_RPM="${TMP_WORKDIR}/rpmfusion-nonfree-release.rpm"
 
-download_with_retry "${FREE_RPM}" "${URLs[free_primary]}" "${URLs[free_fallback]}"
-download_with_retry "${NONFREE_RPM}" "${URLs[nonfree_primary]}" "${URLs[nonfree_fallback]}"
+if ! download_with_retry "${FREE_RPM}" "${URLs[free_primary]}" "${URLs[free_fallback]}"; then
+  echo "Failed to download RPM Fusion FREE repository release package." >&2
+  exit 1
+fi
 
-rpm-ostree install -y --idempotent "${FREE_RPM}" "${NONFREE_RPM}"
+if ! download_with_retry "${NONFREE_RPM}" "${URLs[nonfree_primary]}" "${URLs[nonfree_fallback]}"; then
+  echo "Failed to download RPM Fusion NONFREE repository release package." >&2
+  exit 1
+fi
+rpm-ostree install "${FREE_RPM}" "${NONFREE_RPM}"
