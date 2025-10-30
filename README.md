@@ -49,10 +49,9 @@ After rebasing, you get a helper bundle in `~/Documents/justin-os-scripts/`.
 cd ~/Documents/justin-os-scripts
 bash setup-fedora-distrobox.sh              # full stack
 bash setup-fedora-distrobox.sh --minimal    # essentials only
-bash setup-fedora-distrobox.sh --no-vscode
 ```
 
-The script creates (or replaces) a distrobox using `ghcr.io/ublue-os/fedora-toolbox:latest`, installs base build tools, fzf/zoxide/modern CLI helpers, and—unless disabled—Python, Node.js, Go, Rust, plus VS Code with common extensions. It manages PATH exports and aliases idempotently so reruns are safe.
+The script creates (or replaces) a distrobox using `ghcr.io/ublue-os/fedora-toolbox:latest`, installs base build tools, fzf/zoxide/modern CLI helpers, and—unless `--minimal` is used—Python, Node.js, Go, and Rust. Install GUI editors such as VS Code on the host and attach them to the container as needed; the script focuses solely on CLI tooling. It manages PATH exports and aliases idempotently so reruns are safe.
 
 ---
 
@@ -60,19 +59,22 @@ The script creates (or replaces) a distrobox using `ghcr.io/ublue-os/fedora-tool
 
 Systemd services handle Flatpaks after each new deployment:
 
-- `install-common-flatpaks.service` → installs the main app catalog and records a checksum in `/var/lib/justin-os/common-flatpaks-installed`.
-- `install-surface-flatpaks.service` (Surface image) → adds touch/stylus apps with its own stamp file.
 - `flatpak-auto-update.timer` → runs weekly to update both user and system scopes; exits quietly if offline.
 
-Manual helpers live in `~/Documents/justin-os-scripts/` and exit early if `flatpak`, `jq`, or `rpm-ostree` are missing:
+If Flatpak provisioning misses anything after a deploy, you can reapply the catalog of Flatpak applications directly with BlueBuild. The "catalog" refers to the list of Flatpak apps defined in the BlueBuild configuration file (typically `bluebuild-flatpak-recipe.yml` in the project root). Running the command below will install or update all applications specified in that recipe:
 
 ```bash
-bash install-common-flatpaks.sh
+bluebuild-flatpak-manager apply all
+```
+
+The `install-surface-flatpaks.sh` helper in `~/Documents/justin-os-scripts/` exits early if `flatpak`, `jq`, or `rpm-ostree` are missing:
+
+```bash
 bash install-surface-flatpaks.sh
 bash flatpak-auto-update.sh
 ```
 
-Delete the matching stamp file to force a reinstall on next boot, or run the script directly for an immediate refresh.
+Delete the matching stamp file to force a reinstall on next boot, or rerun the helper for an immediate refresh.
 
 ---
 

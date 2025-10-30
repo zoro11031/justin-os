@@ -13,9 +13,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-CONTAINER_NAME="${DISTROBOX_NAME:-dev-fedora}"
+CONTAINER_NAME="${DISTROBOX_NAME:-fedora-toolbox}"
 TOOLBOX_IMAGE="${TOOLBOX_IMAGE:-ghcr.io/ublue-os/fedora-toolbox:latest}"
-INSTALL_VSCODE="${INSTALL_VSCODE:-true}"
 INSTALL_MINIMAL="${INSTALL_MINIMAL:-false}"
 
 # Helper functions
@@ -42,9 +41,8 @@ Usage: $(basename "$0") [OPTIONS]
 Create and configure a Fedora distrobox for development with common tools and SDKs.
 
 Options:
-    -n, --name NAME         Container name (default: dev-fedora)
+    -n, --name NAME         Container name (default: fedora-toolbox)
     -i, --image IMAGE       Toolbox image (default: ghcr.io/ublue-os/fedora-toolbox:latest)
-    --no-vscode             Skip VS Code installation
     --minimal               Install only essential tools (skip optional SDKs)
     -h, --help              Show this help message
 
@@ -59,8 +57,8 @@ Examples:
     # Create container with custom name
     $(basename "$0") --name my-dev-box
 
-    # Minimal installation without VS Code
-    $(basename "$0") --minimal --no-vscode
+    # Minimal installation without optional SDKs
+    $(basename "$0") --minimal
 
 EOF
 }
@@ -75,10 +73,6 @@ while [[ $# -gt 0 ]]; do
         -i|--image)
             TOOLBOX_IMAGE="$2"
             shift 2
-            ;;
-        --no-vscode)
-            INSTALL_VSCODE="false"
-            shift
             ;;
         --minimal)
             INSTALL_MINIMAL="true"
@@ -128,21 +122,18 @@ success "Container '${CONTAINER_NAME}' created successfully!"
 # Run the setup script inside the container
 info "Running setup inside the container..."
 distrobox enter "${CONTAINER_NAME}" -- env \
-    INSTALL_VSCODE="${INSTALL_VSCODE}" \
     INSTALL_MINIMAL="${INSTALL_MINIMAL}" \
     CONTAINER_NAME="${CONTAINER_NAME}" \
     bash <<'INNER_SCRIPT'
 #!/bin/bash
 set -euo pipefail
 
-INSTALL_VSCODE="${INSTALL_VSCODE:-true}"
 INSTALL_MINIMAL="${INSTALL_MINIMAL:-false}"
 
 # Normalize booleans for comparison
 to_lower() {
     printf '%s' "$1" | tr '[:upper:]' '[:lower:]'
 }
-INSTALL_VSCODE="$(to_lower "${INSTALL_VSCODE}")"
 INSTALL_MINIMAL="$(to_lower "${INSTALL_MINIMAL}")"
 
 # Colors for output
@@ -201,42 +192,69 @@ info "Updating system packages..."
 sudo dnf update -y
 
 info "Installing base development tools..."
-sudo dnf install -y \
-    gcc \
-    gcc-c++ \
-    make \
-    cmake \
-    automake \
-    autoconf \
-    libtool \
-    pkg-config \
-    dnf-plugins-core \
-    git \
-    git-lfs \
-    curl \
-    wget \
-    unzip \
-    tar \
-    gzip \
-    bzip2 \
-    xz \
-    patch \
-    diffutils \
-    vim \
-    nano \
-    tmux \
-    screen \
-    htop \
-    btop \
-    ncdu \
-    tree \
-    jq \
-    ripgrep \
-    fd-find \
-    bat \
+BASE_PACKAGES=(
+    gcc
+    gcc-c++
+    make
+    cmake
+    automake
+    autoconf
+    libtool
+    pkg-config
+    dnf-plugins-core
+    git
+    git-lfs
+    curl
+    wget
+    unzip
+    tar
+    gzip
+    bzip2
+    xz
+    patch
+    diffutils
+    vim
+    nano
+    tmux
+    screen
+    htop
+    btop
+    ncdu
+    tree
+    jq
+    ripgrep
+    fd-find
+    bat
     eza
+)
 
-success "Base development tools installed!"
+BASE_PROCESSED=0
+BASE_SKIPPED=0
+# Attempt to install all base packages in one batch
+if sudo dnf install -y "${BASE_PACKAGES[@]}"; then
+    BASE_PROCESSED=${#BASE_PACKAGES[@]}
+    BASE_SKIPPED=0
+else
+    # If batch install fails, check which packages are missing and try to install them individually
+    for pkg in "${BASE_PACKAGES[@]}"; do
+        if rpm -q "${pkg}" &> /dev/null; then
+            ((BASE_PROCESSED++))
+        else
+            if sudo dnf install -y "${pkg}"; then
+                ((BASE_PROCESSED++))
+            else
+                warn "Package '${pkg}' unavailable or failed to install; skipping."
+                ((BASE_SKIPPED++))
+            fi
+        fi
+    done
+fi
+
+if (( BASE_SKIPPED == 0 )); then
+    success "Base development tools installed!"
+else
+    warn "Processed ${BASE_PROCESSED} packages; skipped ${BASE_SKIPPED}."
+fi
 
 # Install fzf
 info "Installing fzf..."
@@ -353,38 +371,6 @@ if [[ "${INSTALL_MINIMAL}" != "true" ]]; then
     success "Additional development tools installed!"
 fi
 
-# Install VS Code if requested
-if [[ "${INSTALL_VSCODE}" == "true" ]]; then
-    info "Installing VS Code from Microsoft COPR repository..."
-
-    # Add Microsoft COPR repository
-    if ! sudo dnf copr list --enabled | grep -q "microsoft/vscode"; then
-        sudo dnf copr enable -y microsoft/vscode
-    fi
-
-    # Install VS Code
-    sudo dnf install -y code
-
-    success "VS Code installed!"
-
-    info "Installing common VS Code extensions..."
-    # Install common extensions
-    CODE_EXTENSIONS=(
-        ms-python.python
-        golang.go
-        rust-lang.rust-analyzer
-        dbaeumer.vscode-eslint
-        esbenp.prettier-vscode
-        eamodio.gitlens
-        ms-vscode.cmake-tools
-        ms-vscode.cpptools
-    )
-    for extension in "${CODE_EXTENSIONS[@]}"; do
-        code --install-extension "$extension" || warn "Failed to install VS Code extension ${extension}"
-    done
-    success "VS Code extensions installed!"
-fi
-
 # Configure shell integrations
 info "Configuring shell integrations..."
 
@@ -440,17 +426,12 @@ if [[ "${INSTALL_MINIMAL}" != "true" ]]; then
     echo "  - Rust: $(rustc --version 2>&1 | awk '{print $2}')"
 fi
 
-if [[ "${INSTALL_VSCODE}" == "true" ]]; then
-    echo "  - VS Code: $(code --version 2>&1 | head -1)"
-fi
-
 echo ""
 info "To start using your development environment:"
 echo "  1. Exit this container (type 'exit' or Ctrl+D)"
 echo "  2. Enter the container: distrobox enter ${CONTAINER_NAME}"
 echo "  3. Start coding!"
 echo ""
-info "VS Code can be launched with: code"
 info "Use 'z <directory>' instead of 'cd' for faster navigation with zoxide"
 info "Use Ctrl+R for fzf history search"
 
@@ -462,8 +443,5 @@ success "======================================"
 echo ""
 info "To enter your development container:"
 echo "  distrobox enter ${CONTAINER_NAME}"
-echo ""
-info "To export apps from the container to your host:"
-echo "  distrobox-export --app code  # Export VS Code"
 echo ""
 info "For more information, see docs/DEV_IN_CONTAINER.md"
