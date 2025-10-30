@@ -78,7 +78,8 @@ for homedir in /var/home/*; do
             echo "Adding SELinux rule for $nm_cert_path"
             
             # Try to add, if it exists, modify it
-            if semanage fcontext -l | grep -q "^${nm_cert_path}"; then
+            # Use grep -F for literal string matching to avoid regex issues
+            if semanage fcontext -l | grep -F "${nm_cert_path}"; then
                 semanage fcontext -m -t home_cert_t "${nm_cert_path}(/.*)?" 2>/dev/null || true
             else
                 semanage fcontext -a -t home_cert_t "${nm_cert_path}(/.*)?" 2>/dev/null || true
@@ -107,8 +108,8 @@ fi
 echo "Adding general SELinux rule for NetworkManager certificate directories"
 NM_GENERAL_RULE="/var/home/[^/]+/.local/share/networkmanagement/certificates/nm-openvpn(/.*)?"
 
-# Check if NetworkManager general rule already exists
-if semanage fcontext -l | grep -q "/var/home/\[.*networkmanagement"; then
+# Check if NetworkManager general rule already exists with more specific pattern
+if semanage fcontext -l | grep -F "/var/home/[^/]+/.local/share/networkmanagement/certificates/nm-openvpn"; then
     echo "NetworkManager general rule already exists, updating..."
     semanage fcontext -m -t home_cert_t "$NM_GENERAL_RULE" 2>/dev/null || true
 else
