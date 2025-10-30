@@ -33,11 +33,9 @@ Fedora Atomic images tuned for daily development, built on Universal Blue with a
 
 ## Key Features
 
-- **Zsh-first shell** – Powerlevel10k, Zinit, and fast startup defaults; `/bin/sh` stays lightweight by pointing to `dash`.
-- **Lean host** – Language toolchains and heavy editors live in a fedora-toolbox-based distrobox container.
+- **Zsh** – Powerlevel10k, Zinit, and fast startup defaults; `/bin/sh` stays lightweight by pointing to `dash`.
 - **Flatpak-driven apps** – Desktop software installs after deployment and updates via timers, keeping the image small.
-- **Surface polish** – Optional variant layers linux-surface kernel, libwacom tweaks, and stylus-friendly Flatpaks.
-- **Microsoft Core Fonts** – Bundled on the Surface image for better document compatibility.
+- **Surface-on-linux kernel image** – Optional variant layers linux-surface kernel, libwacom tweaks, and stylus-friendly Flatpaks.
 
 ---
 
@@ -67,15 +65,6 @@ If Flatpaks aren't installed when you first boot, you can force install all the 
 bluebuild-flatpak-manager apply all
 ```
 
-The `install-surface-flatpaks.sh` helper in `~/Documents/justin-os-scripts/` exits early if `flatpak`, `jq`, or `rpm-ostree` are missing:
-
-```bash
-bash install-surface-flatpaks.sh
-bash flatpak-auto-update.sh
-```
-
-Delete the matching stamp file to force a reinstall on next boot, or rerun the helper for an immediate refresh.
-
 ---
 
 ## Surface Extras
@@ -84,7 +73,6 @@ The Surface variant layers:
 
 - linux-surface kernel and firmware helpers (`iptsd`, `libwacom-surface`, `thermald`)
 - Touch/stylus-friendly Flatpaks (Loupe, Weather, Xournal++, Krita, etc.)
-- Microsoft Core Fonts installed during image build with a fallback script at `/usr/local/bin/install-ms-fonts.sh`
 
 ---
 
