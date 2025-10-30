@@ -213,6 +213,7 @@ BASE_PACKAGES=(
     xz
     patch
     diffutils
+    fontconfig
     vim
     nano
     tmux
@@ -254,6 +255,44 @@ if (( BASE_SKIPPED == 0 )); then
     success "Base development tools installed!"
 else
     warn "Processed ${BASE_PROCESSED} packages; skipped ${BASE_SKIPPED}."
+fi
+
+# Install JetBrains Mono Nerd Font
+info "Installing JetBrains Mono Nerd Font..."
+if command -v fc-list &> /dev/null && fc-list | grep -qi "JetBrainsMono Nerd Font"; then
+    success "JetBrains Mono Nerd Font already installed"
+else
+    if ! command -v fc-list &> /dev/null; then
+        info "fontconfig utilities missing; installing..."
+        sudo dnf install -y fontconfig
+    fi
+
+    TMP_FONT_DIR="$(mktemp -d)"
+    FONT_ARCHIVE="${TMP_FONT_DIR}/JetBrainsMono.zip"
+    FONT_EXTRACT_DIR="${TMP_FONT_DIR}/JetBrainsMono"
+    FONT_INSTALL_DIR="${HOME}/.local/share/fonts/JetBrainsMono-Nerd-Font"
+
+    if ! curl -fL "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip" -o "${FONT_ARCHIVE}"; then
+        echo -e "${RED}[ERROR]${NC} Failed to download JetBrains Mono Nerd Font archive."
+        rm -rf "${TMP_FONT_DIR}"
+        exit 1
+    fi
+    if ! unzip -q "${FONT_ARCHIVE}" -d "${FONT_EXTRACT_DIR}"; then
+        echo -e "${RED}[ERROR]${NC} Failed to extract JetBrains Mono Nerd Font archive. The file may be corrupted."
+        rm -rf "${TMP_FONT_DIR}"
+        exit 1
+    fi
+
+    mkdir -p "${FONT_INSTALL_DIR}"
+    shopt -s nullglob
+    for font_file in "${FONT_EXTRACT_DIR}"/*.ttf "${FONT_EXTRACT_DIR}"/*.otf; do
+        install -Dm644 "${font_file}" "${FONT_INSTALL_DIR}/$(basename "${font_file}")"
+    done
+    shopt -u nullglob
+
+    fc-cache -f "${HOME}/.local/share/fonts"
+    rm -rf "${TMP_FONT_DIR}"
+    success "JetBrains Mono Nerd Font installed!"
 fi
 
 # Install fzf
