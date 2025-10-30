@@ -1,10 +1,6 @@
 modules:
-  # Microsoft VS Code repository setup
-  - type: rpm-ostree
-    repos:
-      - vscode.repo # stage local repo definition from files/rpm-ostree/vscode.repo
-    install:
-      - code
+  # Development tooling is now managed in a Fedora distrobox container
+  # (see docs/DEV_IN_CONTAINER.md and scripts/setup-fedora-distrobox.sh)
 
   # Core system packages and utilities
   - type: rpm-ostree
@@ -46,7 +42,7 @@ modules:
       - wget # File downloader
       - jq # JSON processor
 
-  # Development tools and virtualization
+  # Virtualization
   - type: rpm-ostree
     install:
       # Virtualization
@@ -65,19 +61,12 @@ modules:
       - virt-viewer
       - edk2-ovmf
 
-      # Development
-      - git
-      - go
-      - gopls
-      - nodejs-bash-language-server
-      - npm
-      - pip
-      - ShellCheck
-      - docker
-      - docker-compose
-      - python3
+      # Note: development languages, editors and CLI tooling (go, python, node,
+      # editors like VS Code, linters, etc.) have been removed from the
+      # system image and should be installed inside a Fedora distrobox. See
+      # docs/DEV_IN_CONTAINER.md for setup and a convenience script in
+      # scripts/setup-fedora-distrobox.sh.
       - libguestfs
-      - shfmt
 
   # Enable virtualization and container services
   - type: systemd

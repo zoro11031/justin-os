@@ -19,6 +19,7 @@ Zsh with Zinit and Powerlevel10k is set as the default shell system-wide. The ma
 All users will use zsh as their default interactive shell.
 
 **Zsh Performance**: Configured for fast startup (~100-200ms) with:
+
 - Zinit plugin manager for fast, parallel plugin loading
 - Powerlevel10k instant prompt for immediate shell availability
 - Async autosuggestions
@@ -26,7 +27,7 @@ All users will use zsh as their default interactive shell.
 - Optimized completion caching
 
 **Development Tools**
-Go, Python, and micro editor. Docker and libvirt for containers and VMs.
+Development languages, editors and CLI tooling (Go, Python, Node.js, VS Code, linters, etc.) are no longer installed system-wide. Instead, this repository provides a recommended Fedora distrobox container workflow so you can keep the host image minimal and run all developer tooling inside an isolated Fedora container. See `docs/DEV_IN_CONTAINER.md` and `scripts/setup-fedora-distrobox.sh` for a quick setup script and instructions.
 
 **Repositories**  
 RPM Fusion (free and nonfree) pre-configured. Surface variant adds linux-surface repo.
@@ -93,12 +94,12 @@ rpm-ostree status
 
 ### Development & Productivity
 
-- **Languages**: Go, Python 3
-- **Editors**: neovim, micro
+- **Languages & runtimes**: Managed inside a Fedora distrobox (Go, Python, Node.js, etc.)
+- **Editors**: neovim, micro (small editors remain on the host; heavy GUI editors are recommended inside the distrobox or via remote development workflows)
 - **Shell**: zsh with Zinit (zsh-autosuggestions, zsh-completions, fast-syntax-highlighting, zsh-autopair, fzf-tab, history-substring-search)
 - **Prompt**: Powerlevel10k
-- **Containers/VMs**: docker, libvirt
-- **Version Control**: git
+- **Containers/VMs**: libvirt (host-level virtualization kept for VMs); container-focused developer tooling can live inside the distrobox
+- **Version Control**: git (if you prefer git on the host it can be kept; otherwise install inside your distrobox)
 
 ### Shell & CLI Tools
 
@@ -112,6 +113,7 @@ rpm-ostree status
 ### Zsh Configuration & Aliases
 
 **Useful Aliases**:
+
 - `vim` → `nvim` - Neovim by default
 - `please` - Re-run last command with sudo
 - `...`, `....`, `.....` - Go up multiple directories
@@ -121,12 +123,14 @@ rpm-ostree status
 - `c` - Clear terminal
 
 **Pipe Aliases** (use anywhere in a command):
+
 - `H` - Pipe to head
 - `T` - Pipe to tail
 - `G` - Pipe to grep
 - `L` - Pipe to less
 
 **Customization**:
+
 - `p10k configure` - Customize Powerlevel10k prompt
 
 **Prompt**: Powerlevel10k with instant prompt for fast shell startup
@@ -140,6 +144,7 @@ rpm-ostree status
 Flatpaks are installed via the default-flatpaks module during the image build. If installation fails or you need to reinstall them, optional scripts are available in `~/Documents/justin-os-scripts/`.
 
 #### Productivity & Office
+
 - Bitwarden (password manager)
 - Joplin (notes)
 - Anki (flashcards)
@@ -148,15 +153,18 @@ Flatpaks are installed via the default-flatpaks module during the image build. I
 - OnlyOffice
 
 #### Communication
+
 - Discord
 - Zoom
 
 #### Browsers
+
 - Brave Browser
 - Google Chrome
 - Mozilla Firefox
 
 #### Media & Entertainment
+
 - Jellyfin Media Player
 - Plexamp
 - Plex Desktop
@@ -166,10 +174,12 @@ Flatpaks are installed via the default-flatpaks module during the image build. I
 - Elisa (music player)
 
 #### Gaming
+
 - Steam
 - ProtonPlus
 
 #### KDE Applications
+
 - Gwenview (image viewer)
 - KCalc (calculator)
 - Kdenlive (video editor)
@@ -181,6 +191,7 @@ Flatpaks are installed via the default-flatpaks module during the image build. I
 - Skanpage (scanner)
 
 #### Development & Utilities
+
 - Pods (container management)
 - Flatseal (flatpak permissions)
 - BoxBuddy (toolbox manager)
@@ -230,6 +241,7 @@ Want to customize it? Fork the repo and:
 ### Helper Scripts
 
 Optional scripts are available in `~/Documents/justin-os-scripts/`:
+
 - `install-common-flatpaks.sh` - Manually install all common flatpaks
 - `install-surface-flatpaks.sh` - Manually install Surface flatpaks
 - `flatpak-auto-update.sh` - Update all flatpaks
@@ -239,16 +251,19 @@ Check out the [BlueBuild docs](https://blue-build.org/learn/getting-started/) fo
 ## Requirements
 
 **Hardware:**
+
 - x86_64 CPU
 - 8 GB RAM minimum (16 GB recommended)
 - 30 GB free disk space minimum
 - SSD recommended for best performance
 
 **Software:**
+
 - Existing Fedora Atomic installation (Silverblue, Kinoite, or any Universal Blue variant)
 - Fedora 43 (main build) or Fedora 42 (Surface build)
 
 **For Surface variant:**
+
 - Microsoft Surface device (tested on Surface Pro 7)
 - Secure Boot support recommended (Surface SecureBoot certificate included)
 
@@ -280,6 +295,7 @@ bash install-common-flatpaks.sh
 ```
 
 For the Surface variant:
+
 ```bash
 bash install-surface-flatpaks.sh
 ```
@@ -319,6 +335,7 @@ This repository automatically syncs dotfiles from [zoro11031/dotfiles](https://g
 To enable PR creation, you need to either:
 
 1. **Use a Personal Access Token (recommended):**
+
    - Create a GitHub PAT with `repo` or `public_repo` scope
    - Add it as a repository secret named `GH_PAT`
    - Go to Settings → Secrets and variables → Actions → New repository secret
@@ -328,6 +345,7 @@ To enable PR creation, you need to either:
    - Enable "Allow GitHub Actions to create and approve pull requests"
 
 The workflow runs:
+
 - Daily at 2 AM UTC
 - Manually via workflow_dispatch
 - On webhook from dotfiles repo updates
