@@ -49,6 +49,7 @@ modules:
     install:
       # Virtualization
       - guestfs-tools
+      - gnome-boxes
       - libvirt
       - libvirt-daemon-config-network
       - libvirt-daemon-kvm
