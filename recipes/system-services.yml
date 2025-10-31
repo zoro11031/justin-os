@@ -1,20 +1,4 @@
-modules:
-  # VPN SELinux fix
-  - type: rpm-ostree
-    install:
-      - policycoreutils-python-utils # Provides semanage command for permanent SELinux fixes
-
-  - type: files
-    files:
-      - source: scripts/fix-vpn-selinux.sh
-        destination: /usr/bin/fix-vpn-selinux.sh
-        mode: '0755'
-      - source: systemd/fix-vpn-selinux.service
-        destination: /usr/lib/systemd/system/fix-vpn-selinux.service
-      - source: systemd/fix-vpn-selinux.timer
-        destination: /usr/lib/systemd/system/fix-vpn-selinux.timer
-
-  # Dash shell service (for main build only)
+# Dash shell service (for main build only)
   - type: files
     files:
       - source: systemd/set-dash-as-sh.service
@@ -24,6 +8,4 @@ modules:
   - type: systemd
     system:
       enabled:
-        - fix-vpn-selinux.service
-        - fix-vpn-selinux.timer
         - set-dash-as-sh.service
