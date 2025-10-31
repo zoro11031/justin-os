@@ -148,32 +148,6 @@ success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-BASHRC="${HOME}/.bashrc"
-touch "${BASHRC}"
-
-append_line_to_bashrc() {
-    local line="$1"
-    if ! grep -Fqx "$line" "${BASHRC}"; then
-        echo "$line" >> "${BASHRC}"
-    fi
-}
-
-append_block_to_bashrc() {
-    local marker="$1"
-    local closing="${marker//>>>/<<<}"
-    if ! grep -Fq "$marker" "${BASHRC}"; then
-        {
-            echo ""
-            echo "$marker"
-            cat
-            echo "$closing"
-        } >> "${BASHRC}"
-    else
-        # Consume stdin so heredoc does not leak to terminal
-        cat > /dev/null
-    fi
-}
-
 ensure_path_prefix() {
     local dir="$1"
     if [[ -d "$dir" && ":${PATH}:" != *":${dir}:"* ]]; then
@@ -191,71 +165,133 @@ ensure_path_suffix() {
 info "Updating system packages..."
 sudo dnf update -y
 
-info "Installing base development tools..."
-BASE_PACKAGES=(
-    gcc
-    gcc-c++
-    make
-    cmake
-    automake
-    autoconf
-    libtool
-    pkg-config
-    dnf-plugins-core
-    git
-    git-lfs
-    curl
-    wget
-    unzip
-    tar
-    gzip
-    bzip2
-    xz
-    patch
-    diffutils
-    fontconfig
-    vim
-    nano
-    tmux
-    screen
-    htop
-    btop
-    ncdu
-    tree
-    jq
-    ripgrep
-    fd-find
-    bat
-    eza
-)
+info "Enabling RPM Fusion repositories..."
+FEDORA_RELEASE="$(rpm -E %fedora)"
+RPMFUSION_FREE="rpmfusion-free-release-${FEDORA_RELEASE}"
+RPMFUSION_NONFREE="rpmfusion-nonfree-release-${FEDORA_RELEASE}"
 
-BASE_PROCESSED=0
-BASE_SKIPPED=0
-# Attempt to install all base packages in one batch
-if sudo dnf install -y "${BASE_PACKAGES[@]}"; then
-    BASE_PROCESSED=${#BASE_PACKAGES[@]}
-    BASE_SKIPPED=0
-else
-    # If batch install fails, check which packages are missing and try to install them individually
-    for pkg in "${BASE_PACKAGES[@]}"; do
-        if rpm -q "${pkg}" &> /dev/null; then
-            ((BASE_PROCESSED++))
-        else
-            if sudo dnf install -y "${pkg}"; then
-                ((BASE_PROCESSED++))
+enable_rpmfusion_release() {
+    local package_name="$1"
+    local url="$2"
+    if rpm -q "${package_name}" &> /dev/null; then
+        info "${package_name} already installed."
+        return 0
+    fi
+
+    if sudo dnf install -y "${url}"; then
+        success "Enabled ${package_name}."
+        return 0
+    fi
+
+    warn "Failed to enable ${package_name}; repository-dependent packages may be skipped."
+    return 1
+}
+
+enable_rpmfusion_release "${RPMFUSION_FREE}" \
+    "https://download1.rpmfusion.org/free/fedora/${RPMFUSION_FREE}.noarch.rpm"
+enable_rpmfusion_release "${RPMFUSION_NONFREE}" \
+    "https://download1.rpmfusion.org/nonfree/fedora/${RPMFUSION_NONFREE}.noarch.rpm"
+
+sudo dnf makecache -y
+
+info "Installing base development tools..."
+dnf_package_available() {
+    local package_name="$1"
+    if sudo dnf list --installed "${package_name}" &> /dev/null; then
+        return 0
+    fi
+
+    sudo dnf list --available "${package_name}" &> /dev/null
+}
+
+install_package_group() {
+    local description="$1"
+    shift
+    local packages=("$@")
+    local total=${#packages[@]}
+    local installed=0
+    local skipped=0
+
+    for package in "${packages[@]}"; do
+        if rpm -q "${package}" &> /dev/null; then
+            ((installed++))
+            continue
+        fi
+
+        if dnf_package_available "${package}"; then
+            if sudo dnf install -y "${package}"; then
+                ((installed++))
             else
-                warn "Package '${pkg}' unavailable or failed to install; skipping."
-                ((BASE_SKIPPED++))
+                warn "Failed to install package '${package}'; skipping."
+                ((skipped++))
             fi
+        else
+            warn "Package '${package}' is not available in enabled repositories; skipping."
+            ((skipped++))
         fi
     done
-fi
 
-if (( BASE_SKIPPED == 0 )); then
-    success "Base development tools installed!"
-else
-    warn "Processed ${BASE_PROCESSED} packages; skipped ${BASE_SKIPPED}."
-fi
+    if (( skipped == 0 )); then
+        success "${description} installed!"
+    else
+        info "${description}: installed ${installed}/${total} packages (skipped ${skipped})."
+    fi
+}
+
+list_present_commands() {
+    local commands=("$@")
+    local present=()
+    for cmd in "${commands[@]}"; do
+        if command -v "$cmd" &> /dev/null; then
+            present+=("$cmd")
+        fi
+    done
+
+    if (( ${#present[@]} == 0 )); then
+        printf 'none'
+    else
+        local IFS=', '
+        printf '%s' "${present[*]}"
+    fi
+}
+
+BASE_PACKAGES=(
+    automake
+    autoconf
+    bat
+    btop
+    bzip2
+    cmake
+    curl
+    diffutils
+    dnf-plugins-core
+    fd-find
+    fontconfig
+    gcc
+    gcc-c++
+    git
+    git-lfs
+    gzip
+    htop
+    jq
+    libtool
+    make
+    nano
+    ncdu
+    patch
+    pkgconf-pkg-config
+    ripgrep
+    screen
+    tar
+    tmux
+    tree
+    unzip
+    vim-enhanced
+    wget
+    xz
+)
+
+install_package_group "Base development tools" "${BASE_PACKAGES[@]}"
 
 # Install JetBrains Mono Nerd Font
 info "Installing JetBrains Mono Nerd Font..."
@@ -263,8 +299,7 @@ if command -v fc-list &> /dev/null && fc-list | grep -qi "JetBrainsMono Nerd Fon
     success "JetBrains Mono Nerd Font already installed"
 else
     if ! command -v fc-list &> /dev/null; then
-        info "fontconfig utilities missing; installing..."
-        sudo dnf install -y fontconfig
+        install_package_group "fontconfig utilities" fontconfig
     fi
 
     TMP_FONT_DIR="$(mktemp -d)"
@@ -295,30 +330,14 @@ else
     success "JetBrains Mono Nerd Font installed!"
 fi
 
-# Install fzf
-info "Installing fzf..."
-if ! command -v fzf &> /dev/null; then
-    sudo dnf install -y fzf
-    success "fzf installed!"
-else
-    success "fzf already installed"
-fi
-
-# Install zoxide
-info "Installing zoxide..."
-if ! command -v zoxide &> /dev/null; then
-    sudo dnf install -y zoxide
-    success "zoxide installed!"
-else
-    success "zoxide already installed"
-fi
+install_package_group "Shell navigation tools" fzf zoxide
 
 if [[ "${INSTALL_MINIMAL}" != "true" ]]; then
     info "Installing language SDKs and runtimes..."
 
     # Python
     info "Installing Python development environment..."
-    sudo dnf install -y \
+    install_package_group "Python build dependencies" \
         python3 \
         python3-pip \
         python3-devel \
@@ -327,68 +346,79 @@ if [[ "${INSTALL_MINIMAL}" != "true" ]]; then
         python3-virtualenv \
         pipx
 
-    pipx ensurepath
-    mkdir -p "${HOME}/.local/bin"
-    ensure_path_prefix "${HOME}/.local/bin"
-    export PATH
+    if command -v pipx &> /dev/null; then
+        mkdir -p "${HOME}/.local/bin"
+        ensure_path_prefix "${HOME}/.local/bin"
+        export PATH
 
-    # Install common Python tools via pipx (idempotent)
-    PYTHON_TOOLS=(
-        poetry
-        black
-        ruff
-        mypy
-        pylint
-    )
+        # Install common Python tools via pipx (idempotent)
+        PYTHON_TOOLS=(
+            poetry
+            black
+            ruff
+            mypy
+            pylint
+        )
 
-    for tool in "${PYTHON_TOOLS[@]}"; do
-        pipx install --force "$tool"
-    done
-    success "Python environment installed!"
+        for tool in "${PYTHON_TOOLS[@]}"; do
+            pipx install --force "$tool"
+        done
+        info "pipx-installed binaries are available for this session. Confirm ~/.local/bin is on your PATH in your own shell configuration."
+        success "Python environment installed!"
+    else
+        warn "pipx not available; skipping Python tooling bootstrap."
+    fi
 
     # Node.js and npm
     info "Installing Node.js and npm..."
-    sudo dnf install -y nodejs npm
+    install_package_group "Node.js toolchain" nodejs npm
 
     # Install common global npm packages
-    NPM_PREFIX="${HOME}/.npm-global"
-    mkdir -p "${NPM_PREFIX}"
-    npm config set prefix "${NPM_PREFIX}"
-    append_line_to_bashrc 'export PATH="$HOME/.npm-global/bin:$PATH"'
-    ensure_path_prefix "${NPM_PREFIX}/bin"
-    export PATH
+    if command -v npm &> /dev/null; then
+        NPM_PREFIX="${HOME}/.npm-global"
+        mkdir -p "${NPM_PREFIX}"
+        npm config set prefix "${NPM_PREFIX}"
+        ensure_path_prefix "${NPM_PREFIX}/bin"
+        export PATH
 
-    npm install -g yarn pnpm typescript ts-node eslint prettier npm-check-updates
-    success "Node.js and npm installed!"
+        npm install -g yarn pnpm typescript ts-node eslint prettier npm-check-updates
+        info "Global npm bin directory (${NPM_PREFIX}/bin) added for this session. Update your shell configuration manually if needed."
+        success "Node.js and npm installed!"
+    else
+        warn "npm not available; skipping global Node.js tooling install."
+    fi
 
     # Go
     info "Installing Go..."
-    sudo dnf install -y golang
+    install_package_group "Go toolchain" golang
 
     # Setup Go environment
-    mkdir -p ~/go/{bin,src,pkg}
-    append_line_to_bashrc 'export GOPATH="$HOME/go"'
-    append_line_to_bashrc 'export PATH="$PATH:$GOPATH/bin"'
-    export GOPATH="$HOME/go"
-    ensure_path_suffix "${GOPATH}/bin"
-    export PATH
+    if command -v go &> /dev/null; then
+        mkdir -p ~/go/{bin,src,pkg}
+        export GOPATH="$HOME/go"
+        ensure_path_suffix "${GOPATH}/bin"
+        export PATH
 
-    # Install common Go tools
-    go install golang.org/x/tools/gopls@latest
-    go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-    go install honnef.co/go/tools/cmd/staticcheck@latest
-    success "Go installed!"
+        # Install common Go tools
+        go install golang.org/x/tools/gopls@latest
+        go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+        go install honnef.co/go/tools/cmd/staticcheck@latest
+        info "Go workspace configured for this session. Add ${GOPATH}/bin to your shell PATH manually if not already present."
+        success "Go installed!"
+    else
+        warn "Go compiler not available; skipping Go workspace configuration."
+    fi
 
     # Rust
     info "Installing Rust..."
     if ! command -v rustc &> /dev/null; then
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
         source "$HOME/.cargo/env"
-        append_line_to_bashrc 'source "$HOME/.cargo/env"'
 
         # Install common Rust tools
         cargo install cargo-edit
         cargo install cargo-watch
+        info "Rust environment loaded for this session. Ensure ~/.cargo/bin is on your PATH in your own shell configuration."
         success "Rust installed!"
     else
         success "Rust already installed"
@@ -396,10 +426,8 @@ if [[ "${INSTALL_MINIMAL}" != "true" ]]; then
 
     # Additional development tools
     info "Installing additional development tools..."
-    if ! sudo dnf install -y docker-ce-cli; then
-        warn "docker-ce-cli not available in current repos, skipping."
-    fi
-    sudo dnf install -y \
+    install_package_group "Container and debugging tools" \
+        podman \
         podman-compose \
         lazygit \
         gh \
@@ -407,45 +435,9 @@ if [[ "${INSTALL_MINIMAL}" != "true" ]]; then
         valgrind \
         strace \
         ltrace
-    success "Additional development tools installed!"
 fi
 
-# Configure shell integrations
-info "Configuring shell integrations..."
-
-# Add fzf key bindings and completion
-if [ -f /usr/share/fzf/shell/key-bindings.bash ]; then
-    append_line_to_bashrc 'source /usr/share/fzf/shell/key-bindings.bash'
-fi
-
-# Add zoxide init
-append_line_to_bashrc 'eval "$(zoxide init bash)"'
-
-# Add useful aliases
-append_block_to_bashrc "# >>> justin-os dev aliases >>>" <<'EOF'
-# Development aliases
-alias g='git'
-alias dc='docker-compose'
-alias pc='podman-compose'
-alias k='kubectl'
-alias tf='terraform'
-alias v='nvim'
-alias lg='lazygit'
-
-# Modern CLI tool aliases
-alias ls='eza'
-alias cat='bat'
-alias find='fd'
-alias grep='rg'
-alias cd='z'  # zoxide
-
-# Python aliases
-alias py='python3'
-alias pip='pip3'
-alias venv='python3 -m venv'
-EOF
-
-success "Shell integrations configured!"
+info "Skipping shell profile modifications at user request. Review install summary below for any manual PATH updates."
 
 info "Cleaning up..."
 sudo dnf clean all
@@ -455,14 +447,38 @@ success "Development environment setup complete!"
 success "======================================"
 echo ""
 info "Installed tools:"
-echo "  - Base: gcc, g++, make, cmake, git, curl, wget, etc."
-echo "  - CLI utils: fzf, zoxide, ripgrep, fd, bat, eza, jq, btop, lazygit"
+echo "  - Base: $(list_present_commands gcc g++ make cmake git curl wget)"
+echo "  - CLI utils: $(list_present_commands fzf zoxide rg fd bat jq btop lazygit)"
 
 if [[ "${INSTALL_MINIMAL}" != "true" ]]; then
-    echo "  - Python: $(python3 --version 2>&1 | head -1), pip, pipx, poetry, black, ruff"
-    echo "  - Node.js: $(node --version 2>&1), npm, yarn, pnpm, typescript"
-    echo "  - Go: $(go version 2>&1 | awk '{print $3}')"
-    echo "  - Rust: $(rustc --version 2>&1 | awk '{print $2}')"
+    if command -v python3 &> /dev/null; then
+        echo "  - Python: $(python3 --version 2>&1 | head -1)"
+    else
+        echo "  - Python: not installed"
+    fi
+
+    if command -v node &> /dev/null; then
+        node_version="$(node --version 2>&1)"
+        if command -v npm &> /dev/null; then
+            echo "  - Node.js: ${node_version}, npm $(npm --version 2>&1)"
+        else
+            echo "  - Node.js: ${node_version} (npm not installed)"
+        fi
+    else
+        echo "  - Node.js: not installed"
+    fi
+
+    if command -v go &> /dev/null; then
+        echo "  - Go: $(go version 2>&1 | awk '{print $3}')"
+    else
+        echo "  - Go: not installed"
+    fi
+
+    if command -v rustc &> /dev/null; then
+        echo "  - Rust: $(rustc --version 2>&1 | awk '{print $2}')"
+    else
+        echo "  - Rust: not installed"
+    fi
 fi
 
 echo ""
