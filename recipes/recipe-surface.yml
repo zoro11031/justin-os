@@ -26,19 +26,6 @@ modules:
   - from-file: packages-surface.yml
   - from-file: surface-flatpaks.yml
 
-  # VPN SELinux fix (no dash shell service for Surface)
-  - type: rpm-ostree
-    install:
-      - policycoreutils-python-utils
-
-  - type: files
-    files:
-      - source: scripts/fix-vpn-selinux.sh
-        destination: /usr/bin/fix-vpn-selinux.sh
-        mode: '0755'
-      - source: systemd/fix-vpn-selinux.service
-        destination: /usr/lib/systemd/system/fix-vpn-selinux.service
-
   # Shared Microsoft font installation and shell configuration sequence
   - from-file: shared-fonts-shell.yml
 
@@ -66,6 +53,5 @@ modules:
     system:
       enabled:
         - thermald.service
-        - fix-vpn-selinux.service
 
   - type: signing
