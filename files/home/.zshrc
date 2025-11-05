@@ -5,6 +5,15 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# Detect if we're in a dev container (Docker OR Podman)
+if [[ -f "/.dockerenv" ]] || \
+   [[ -n "$REMOTE_CONTAINERS" ]] || \
+   [[ -f "/run/.containerenv" ]]; then
+  INSIDE_CONTAINER=true
+else
+  INSIDE_CONTAINER=false
+fi
+
 if [[ -f "/opt/homebrew/bin/brew" ]] then
   # If you're using macOS, you'll want this enabled
   eval "$(/opt/homebrew/bin/brew shellenv)"
