@@ -13,8 +13,6 @@ modules:
   # Copy system files and home directory templates
   - type: files
     files:
-      - source: home
-        destination: /var/home
       - source: system
         destination: /
 
