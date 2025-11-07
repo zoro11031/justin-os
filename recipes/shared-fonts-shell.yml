@@ -12,4 +12,3 @@ modules:
     scripts:
       - install-ms-fonts-build.sh
       - install-nerd-fonts-build.sh
-      - set-default-shell-zsh.sh
