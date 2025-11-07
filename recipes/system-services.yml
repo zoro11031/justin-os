@@ -1,5 +1,3 @@
-
-
   # Enable system services
   - type: systemd
     system:
