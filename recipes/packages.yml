@@ -3,77 +3,79 @@ modules:
   # (see docs/DEV_IN_CONTAINER.md and scripts/setup-fedora-distrobox.sh)
 
   # Core system packages and utilities
-  - type: rpm-ostree
+  - type: dnf
     repos:
       - https://copr.fedorainfracloud.org/coprs/scottames/ghostty/repo/fedora-%OS_VERSION%/scottames-ghostty-fedora-%OS_VERSION%.repo
-      - vscode.repo # stage local repo definition from files/rpm-ostree/vscode.repo
+      - vscode.repo # stage local repo definition from files/dnf/vscode.repo
     install:
-      # Shell & Terminal
-      - bat # Syntax highlighting for cat
-      - btop
-      - dialog
-      - fastfetch
-      - zsh
-      - dash # POSIX-compliant system shell that is up to 4x faster than bash
-      - stow
-      - yad
-      - neovim
-      - fzf # Fuzzy finder
-      - zoxide # Smarter cd command with frecency-based directory jumping
-      - ghostty # Terminal emulator with enhanced features written in zig
-      - git-delta # Enhanced git diff viewer with syntax highlighting
-      - tealdeer # Fast tldr client for simplified command examples
+      packages:
+        # Shell & Terminal
+        - bat # Syntax highlighting for cat
+        - btop
+        - dialog
+        - fastfetch
+        - zsh
+        - dash # POSIX-compliant system shell that is up to 4x faster than bash
+        - stow
+        - yad
+        - neovim
+        - fzf # Fuzzy finder
+        - zoxide # Smarter cd command with frecency-based directory jumping
+        - ghostty # Terminal emulator with enhanced features written in zig
+        - git-delta # Enhanced git diff viewer with syntax highlighting
+        - tealdeer # Fast tldr client for simplified command examples
 
-      # Fonts
-      - jetbrains-mono-fonts-all # JetBrains Mono with Nerd Font symbols
-      - fira-code-fonts # Popular coding font with ligatures
-      - google-noto-sans-fonts # Universal font coverage
-      - google-noto-emoji-fonts # Emoji support
+        # Fonts
+        - jetbrains-mono-fonts-all # JetBrains Mono with Nerd Font symbols
+        - fira-code-fonts # Popular coding font with ligatures
+        - google-noto-sans-fonts # Universal font coverage
+        - google-noto-emoji-fonts # Emoji support
 
-      # GUI
-      - gnome-disk-utility
+        # GUI
+        - gnome-disk-utility
 
-      # System utilities
-      - lm_sensors # Hardware monitoring
-      - htop # Process viewer
-      - rsync # File synchronization
-      - tree # Directory tree viewer
-      - unzip # Archive extraction
-      - curl # HTTP client
-      - wget # File downloader
-      - jq # JSON processor
-      - code # Visual Studio Code
-      - tailscale # Zero-config VPN
+        # System utilities
+        - lm_sensors # Hardware monitoring
+        - htop # Process viewer
+        - rsync # File synchronization
+        - tree # Directory tree viewer
+        - unzip # Archive extraction
+        - curl # HTTP client
+        - wget # File downloader
+        - jq # JSON processor
+        - code # Visual Studio Code
+        - tailscale # Zero-config VPN
 
   # Virtualization
-  - type: rpm-ostree
+  - type: dnf
     install:
-      # Virtualization
-      - guestfs-tools
-      - gnome-boxes
-      - libvirt
-      - libvirt-daemon-config-network
-      - libvirt-daemon-kvm
-      - nmap-ncat
-      - qemu-kvm
-      - remmina
-      - spice-gtk
-      - swtpm
-      - virt-install
-      - virt-manager
-      - virt-top
-      - virt-viewer
-      - edk2-ovmf
+      packages:
+        # Virtualization
+        - guestfs-tools
+        - gnome-boxes
+        - libvirt
+        - libvirt-daemon-config-network
+        - libvirt-daemon-kvm
+        - nmap-ncat
+        - qemu-kvm
+        - remmina
+        - spice-gtk
+        - swtpm
+        - virt-install
+        - virt-manager
+        - virt-top
+        - virt-viewer
+        - edk2-ovmf
 
-      # Note: development languages, editors and CLI tooling (go, python, node,
-      # editors like VS Code, linters, etc.) have been removed from the
-      # system image and should be installed inside a Fedora distrobox. See
-      # docs/DEV_IN_CONTAINER.md for setup and a convenience script in
-      # scripts/setup-fedora-distrobox.sh.
-      - libguestfs
-      - docker
-      - docker-compose
-      - git
+        # Note: development languages, editors and CLI tooling (go, python, node,
+        # editors like VS Code, linters, etc.) have been removed from the
+        # system image and should be installed inside a Fedora distrobox. See
+        # docs/DEV_IN_CONTAINER.md for setup and a convenience script in
+        # scripts/setup-fedora-distrobox.sh.
+        - libguestfs
+        - docker
+        - docker-compose
+        - git
 
   # Enable virtualization and container services
   - type: systemd

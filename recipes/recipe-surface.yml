@@ -5,7 +5,7 @@ image-version: 42
 
 modules:
   # Add linux-surface repo FIRST
-  - type: rpm-ostree
+  - type: dnf
     repos:
       - https://pkg.surfacelinux.com/fedora/linux-surface.repo
 
@@ -30,23 +30,25 @@ modules:
   - from-file: shared-fonts-shell.yml
 
   # Surface-specific packages
-  - type: rpm-ostree
+  - type: dnf
     install:
-      - kernel-surface
-      - kernel-surface-default-watchdog
-      - iptsd
-      - libwacom-surface
-      - libwacom-surface-data
-      - surface-secureboot
-      - thermald
+      packages:
+        - kernel-surface
+        - kernel-surface-default-watchdog
+        - iptsd
+        - libwacom-surface
+        - libwacom-surface-data
+        - surface-secureboot
+        - thermald
     remove:
-      - kernel
-      - kernel-core
-      - kernel-modules
-      - kernel-modules-core
-      - kernel-modules-extra
-      - libwacom
-      - libwacom-data
+      packages:
+        - kernel
+        - kernel-core
+        - kernel-modules
+        - kernel-modules-core
+        - kernel-modules-extra
+        - libwacom
+        - libwacom-data
 
   # Enable services
   - type: systemd

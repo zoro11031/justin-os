@@ -1,19 +1,20 @@
 modules:
   # Surface variant packages (lighter set without dash shell)
-  - type: rpm-ostree
+  - type: dnf
     install:
-      # Shell & Terminal
-      - fastfetch
-      - zsh
+      packages:
+        # Shell & Terminal
+        - fastfetch
+        - zsh
 
-      # GUI
-      - gnome-disk-utility
+        # GUI
+        - gnome-disk-utility
 
-      # System utilities
-      - lm_sensors # Hardware monitoring
-      - htop # Process viewer
-      - rsync # File synchronization
-      - tree # Directory tree viewer
-      - unzip # Archive extraction
-      - curl # HTTP client
-      - wget # File downloader
+        # System utilities
+        - lm_sensors # Hardware monitoring
+        - htop # Process viewer
+        - rsync # File synchronization
+        - tree # Directory tree viewer
+        - unzip # Archive extraction
+        - curl # HTTP client
+        - wget # File downloader

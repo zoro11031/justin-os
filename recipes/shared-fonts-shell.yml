@@ -1,11 +1,12 @@
 modules:
   # Microsoft Core Fonts dependencies and installer
-  - type: rpm-ostree
+  - type: dnf
     install:
-      - curl
-      - cabextract
-      - xorg-x11-font-utils # Required by msttcore-fonts-installer
-      - fontconfig
+      packages:
+        - curl
+        - cabextract
+        - xorg-x11-font-utils # Required by msttcore-fonts-installer
+        - fontconfig
 
   # Configure shells and install fonts (BEFORE changing /bin/sh)
   - type: script
