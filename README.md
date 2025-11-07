@@ -31,27 +31,6 @@ Fedora Atomic images tuned for daily development, built on Universal Blue with a
 
 ---
 
-## Key Features
-
-- **Zsh** – Powerlevel10k, Zinit, and fast startup defaults; `/bin/sh` stays lightweight by pointing to `dash`.
-- **Flatpak-driven apps** – Desktop software installs after deployment and updates via timers, keeping the image small.
-- **Surface-on-linux kernel image** – Optional variant layers linux-surface kernel, libwacom tweaks, and stylus-friendly Flatpaks.
-
----
-
-## Development Environment
-
-After rebasing, you get a helper bundle in `~/Documents/justin-os-scripts/`.
-
-```bash
-cd ~/Documents/justin-os-scripts
-bash setup-fedora-distrobox.sh              # full stack
-bash setup-fedora-distrobox.sh --minimal    # essentials only
-```
-
-The script creates (or replaces) a distrobox using `ghcr.io/ublue-os/fedora-toolbox:latest`, installs base build tools, fzf/zoxide/modern CLI helpers, and—unless `--minimal` is used—Python, Node.js, Go, and Rust. Install GUI editors such as VS Code on the host and attach them to the container as needed; the script focuses solely on CLI tooling. It manages PATH exports and aliases idempotently so reruns are safe.
-
----
 
 ## Flatpaks & Updates
 
