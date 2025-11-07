@@ -1,9 +1,4 @@
-modules:
-  # Dash shell service (for main build only)
-  - type: files
-    files:
-      - source: systemd/set-dash-as-sh.service
-        destination: /usr/lib/systemd/system/set-dash-as-sh.service
+
 
   # Enable system services
   - type: systemd
