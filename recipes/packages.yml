@@ -43,6 +43,7 @@ modules:
       - wget # File downloader
       - jq # JSON processor
       - code # Visual Studio Code
+      - tailscale # Zero-config VPN
 
   # Virtualization
   - type: rpm-ostree
