@@ -1,8 +1,0 @@
-set number relativenumber
-set tabstop=4 shiftwidth=4 expandtab
-set ignorecase smartcase incsearch hlsearch
-set mouse=a
-set clipboard=unnamedplus
-set wildmenu
-syntax on
-
