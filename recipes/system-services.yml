@@ -1,5 +1,5 @@
   # Enable system services
-  - type: systemd
-    system:
-      enabled:
-        - set-dash-as-sh.service
+- type: systemd
+  system:
+    enabled:
+      - set-dash-as-sh.service
