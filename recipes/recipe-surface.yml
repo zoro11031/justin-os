@@ -19,6 +19,7 @@ modules:
   - type: script
     scripts:
       - install-rpmfusion-release.sh
+      - update-hosts.sh
 
   # Import shared modules
   - from-file: packages-surface.yml
