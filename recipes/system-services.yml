@@ -3,5 +3,6 @@
 type: systemd
 system:
   enabled:
+    - earlyoom.service
     - set-dash-as-sh.service
     - update-hosts.service

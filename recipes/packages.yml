@@ -35,6 +35,7 @@ modules:
 
       # System utilities
       - lm_sensors # Hardware monitoring
+      - earlyoom # Early OOM Daemon
       - htop # Process viewer
       - rsync # File synchronization
       - tree # Directory tree viewer
