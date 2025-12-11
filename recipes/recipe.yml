@@ -55,6 +55,11 @@ modules:
   # Shared Microsoft font installation and shell configuration sequence
   - from-file: shared-fonts-shell.yml
 
+  # Disable systemd-oomd to prevent conflicts with nohang
+  - type: script
+    scripts:
+      - disable-systemd-oomd.sh
+
   - type: signing
 
   # Change /bin/sh to dash (MUST BE LAST - after all package operations)

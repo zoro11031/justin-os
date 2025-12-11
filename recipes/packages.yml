@@ -6,8 +6,12 @@ modules:
   - type: rpm-ostree
     repos:
       - https://copr.fedorainfracloud.org/coprs/scottames/ghostty/repo/fedora-%OS_VERSION%/scottames-ghostty-fedora-%OS_VERSION%.repo
+      - https://copr.fedorainfracloud.org/coprs/atim/nohang/repo/fedora-%OS_VERSION%/atim-nohang-fedora-%OS_VERSION%.repo
       - vscode.repo # stage local repo definition from files/rpm-ostree/vscode.repo
     install:
+      # Memory management
+      - nohang
+
       # Shell & Terminal
       - bat # Syntax highlighting for cat
       - btop
@@ -81,3 +85,4 @@ modules:
       enabled:
         - docker.service
         - libvirtd.service
+        - nohang.service

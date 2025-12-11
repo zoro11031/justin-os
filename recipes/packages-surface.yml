@@ -1,7 +1,12 @@
 modules:
   # Surface variant packages (lighter set without dash shell)
   - type: rpm-ostree
+    repos:
+      - https://copr.fedorainfracloud.org/coprs/atim/nohang/repo/fedora-%OS_VERSION%/atim-nohang-fedora-%OS_VERSION%.repo
     install:
+      # Memory management
+      - nohang
+
       # Shell & Terminal
       - fastfetch
       - zsh

@@ -51,5 +51,11 @@ modules:
     system:
       enabled:
         - thermald.service
+        - nohang.service
+
+  # Disable systemd-oomd to prevent conflicts with nohang
+  - type: script
+    scripts:
+      - disable-systemd-oomd.sh
 
   - type: signing
