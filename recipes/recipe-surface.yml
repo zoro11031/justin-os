@@ -50,6 +50,12 @@ modules:
   - type: systemd
     system:
       enabled:
+        - earlyoom.service
         - thermald.service
+
+  # Disable systemd-oomd (should be done after systemd enabled services)
+  - type: script
+    scripts:
+      - disable-systemd-oomd.sh
 
   - type: signing
