@@ -60,5 +60,4 @@ modules:
   # Change /bin/sh to dash (MUST BE LAST - after all package operations)
   - type: script
     scripts:
-      - disable-systemd-oomd.sh
       - set-dash-as-sh.sh

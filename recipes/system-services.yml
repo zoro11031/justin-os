@@ -6,3 +6,5 @@ system:
     - earlyoom.service
     - set-dash-as-sh.service
     - update-hosts.service
+  masked:
+    - systemd-oomd.service
