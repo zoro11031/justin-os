@@ -47,6 +47,11 @@ modules:
     scripts:
       - ensure-microsoft-gpg.sh
 
+  # Seed capture groups used by Wireshark/tcpdump-style package metadata.
+  - type: script
+    scripts:
+      - ensure-capture-groups.sh
+
   # Import consolidated modules
   - from-file: packages.yml
   - from-file: system-services.yml

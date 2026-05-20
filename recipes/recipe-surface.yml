@@ -20,6 +20,11 @@ modules:
     scripts:
       - install-rpmfusion-release.sh
 
+  # Seed capture groups used by Wireshark/tcpdump-style package metadata.
+  - type: script
+    scripts:
+      - ensure-capture-groups.sh
+
   # Import shared modules
   - from-file: packages-surface.yml
   - from-file: surface-flatpaks.yml
