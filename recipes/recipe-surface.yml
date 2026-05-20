@@ -15,6 +15,11 @@ modules:
       - source: system
         destination: /
 
+  # Disable repositories known to be broken in certain base images
+  - type: script
+    scripts:
+      - disable-broken-repos.sh
+
   # Install RPM Fusion repositories with resilient mirror selection
   - type: script
     scripts:
