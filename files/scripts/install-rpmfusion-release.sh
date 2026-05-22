@@ -4,6 +4,30 @@ set -euo pipefail
 RETRY_COUNT="${RPMFUSION_RETRY_COUNT:-5}"
 RETRY_DELAY="${RPMFUSION_RETRY_DELAY:-10}"
 
+has_negativo17_multimedia_repo() {
+  local repo_dir
+  local repo_file
+
+  for repo_dir in /etc/yum.repos.d /usr/etc/yum.repos.d; do
+    [ -d "${repo_dir}" ] || continue
+
+    for repo_file in "${repo_dir}"/*.repo; do
+      [ -e "${repo_file}" ] || continue
+
+      if grep -qi "negativo17" "${repo_file}" && grep -qi "multimedia" "${repo_file}"; then
+        return 0
+      fi
+    done
+  done
+
+  return 1
+}
+
+if has_negativo17_multimedia_repo; then
+  echo "negativo17 multimedia repo is inherited from the base image; skipping RPM Fusion install."
+  exit 0
+fi
+
 if rpm -q rpmfusion-free-release >/dev/null 2>&1 \
   && rpm -q rpmfusion-nonfree-release >/dev/null 2>&1; then
   echo "RPM Fusion release packages already installed; skipping download."
@@ -22,26 +46,6 @@ if [[ -z "${OS_VERSION}" ]]; then
   echo "Fedora version is empty; cannot build RPM Fusion URLs" >&2
   exit 1
 fi
-
-disable_broken_rpmmd_repos() {
-  local repo_dir
-  local repo_file
-
-  for repo_dir in /etc/yum.repos.d /usr/etc/yum.repos.d; do
-    [ -d "${repo_dir}" ] || continue
-
-    for repo_file in "${repo_dir}"/*.repo; do
-      [ -e "${repo_file}" ] || continue
-
-      if grep -qi "negativo17" "${repo_file}" && grep -qi "multimedia" "${repo_file}"; then
-        echo "Disabling broken repo before rpm-ostree install: $(basename "${repo_file}")"
-        sed -i -E 's/^[[:space:]]*enabled[[:space:]]*=[[:space:]]*1[[:space:]]*$/enabled=0/I' "${repo_file}"
-        sed -i -E 's/^[[:space:]]*enabled_metadata[[:space:]]*=[[:space:]]*1[[:space:]]*$/enabled_metadata=0/I' "${repo_file}"
-        mv -f "${repo_file}" "${repo_file}.disabled"
-      fi
-    done
-  done
-}
 
 primary_free="https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-%OS_VERSION%.noarch.rpm"
 primary_nonfree="https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-%OS_VERSION%.noarch.rpm"
@@ -96,7 +100,6 @@ else
 fi
 
 if [[ "${free_downloaded}" -eq 1 && "${nonfree_downloaded}" -eq 1 ]]; then
-  disable_broken_rpmmd_repos
   rpm-ostree install "${FREE_RPM}" "${NONFREE_RPM}"
 else
   echo "Both RPM Fusion FREE and NONFREE packages must be downloaded successfully before installation." >&2
