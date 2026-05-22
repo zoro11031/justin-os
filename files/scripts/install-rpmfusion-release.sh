@@ -23,6 +23,26 @@ if [[ -z "${OS_VERSION}" ]]; then
   exit 1
 fi
 
+disable_broken_rpmmd_repos() {
+  local repo_dir
+  local repo_file
+
+  for repo_dir in /etc/yum.repos.d /usr/etc/yum.repos.d; do
+    [ -d "${repo_dir}" ] || continue
+
+    for repo_file in "${repo_dir}"/*.repo; do
+      [ -e "${repo_file}" ] || continue
+
+      if grep -qi "negativo17" "${repo_file}" && grep -qi "multimedia" "${repo_file}"; then
+        echo "Disabling broken repo before rpm-ostree install: $(basename "${repo_file}")"
+        sed -i -E 's/^[[:space:]]*enabled[[:space:]]*=[[:space:]]*1[[:space:]]*$/enabled=0/I' "${repo_file}"
+        sed -i -E 's/^[[:space:]]*enabled_metadata[[:space:]]*=[[:space:]]*1[[:space:]]*$/enabled_metadata=0/I' "${repo_file}"
+        mv -f "${repo_file}" "${repo_file}.disabled"
+      fi
+    done
+  done
+}
+
 primary_free="https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-%OS_VERSION%.noarch.rpm"
 primary_nonfree="https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-%OS_VERSION%.noarch.rpm"
 fallback_free="https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-%OS_VERSION%.noarch.rpm"
@@ -76,6 +96,7 @@ else
 fi
 
 if [[ "${free_downloaded}" -eq 1 && "${nonfree_downloaded}" -eq 1 ]]; then
+  disable_broken_rpmmd_repos
   rpm-ostree install "${FREE_RPM}" "${NONFREE_RPM}"
 else
   echo "Both RPM Fusion FREE and NONFREE packages must be downloaded successfully before installation." >&2
