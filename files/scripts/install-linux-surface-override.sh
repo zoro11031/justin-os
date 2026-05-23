@@ -42,13 +42,22 @@ else
     exit 1
   fi
 fi
-KERNEL_URL="$(
-  printf '%s' "${RELEASE_JSON}" \
-    | grep -Eo '"browser_download_url":\s*"[^"]+"' \
-    | cut -d'"' -f4 \
-    | grep -E "kernel-[0-9]+[^/]*\\.surface\\.fc${OS_VERSION}\\.x86_64\\.rpm" \
-    | head -n1
-)"
+if command -v jq >/dev/null 2>&1; then
+  KERNEL_URL="$(
+    printf '%s' "${RELEASE_JSON}" \
+      | jq -r --arg os_version "${OS_VERSION}" \
+        '.assets[].browser_download_url | select(test("kernel-[0-9]+[^/]*\\.surface\\.fc" + $os_version + "\\.x86_64\\.rpm$"))' \
+      | head -n1
+  )"
+else
+  KERNEL_URL="$(
+    printf '%s' "${RELEASE_JSON}" \
+      | grep -Eo '"browser_download_url":\s*"[^"]+"' \
+      | cut -d'"' -f4 \
+      | grep -E "kernel-[0-9]+[^/]*\\.surface\\.fc${OS_VERSION}\\.x86_64\\.rpm" \
+      | head -n1
+  )"
+fi
 
 if [[ -z "${KERNEL_URL}" ]]; then
   echo "Unable to locate linux-surface dummy kernel RPM for Fedora ${OS_VERSION}" >&2
@@ -79,17 +88,20 @@ if ! rpm-ostree override replace "./${KERNEL_FILENAME}" \
   --install iptsd \
   --install libwacom-surface \
   --install libwacom-surface-data; then
-  echo "Failed to apply linux-surface kernel override via rpm-ostree" >&2
-  exit 1
+  status=$?
+  echo "Failed to apply linux-surface kernel override via rpm-ostree (exit ${status})" >&2
+  exit "${status}"
 fi
 popd >/dev/null
 
 if ! rpm-ostree install kernel-surface-default-watchdog thermald; then
-  echo "Failed to install linux-surface companion packages" >&2
-  exit 1
+  status=$?
+  echo "Failed to install linux-surface companion packages (exit ${status})" >&2
+  exit "${status}"
 fi
 
 if ! rpm-ostree install surface-secureboot; then
-  echo "Failed to install surface-secureboot" >&2
-  exit 1
+  status=$?
+  echo "Failed to install surface-secureboot (exit ${status})" >&2
+  exit "${status}"
 fi
