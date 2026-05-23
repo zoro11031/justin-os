@@ -32,7 +32,23 @@ jobs:
 
     steps:
       # the build is fully handled by the reusable github action
-      - name: Build Custom Image
+      # Signing/pushing requires package write + secrets; PRs (especially forks) lack those, causing 401s.
+      - name: Build Custom Image (PR)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: blue-build/github-action@v1.11
+        with:
+          recipe: ${{ matrix.recipe }}
+          push: "false"
+          cosign_private_key: ""
+          registry_token: ""
+          pr_event_number: ${{ github.event.number }}
+          retry_push_count: 5
+
+          # enabled by default, disable if your image is small and you want faster builds
+          maximize_build_space: true
+
+      - name: Build Custom Image (publish)
+        if: ${{ github.event_name != 'pull_request' }}
         uses: blue-build/github-action@v1.11
         with:
           recipe: ${{ matrix.recipe }}
