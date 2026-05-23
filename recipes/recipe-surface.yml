@@ -15,11 +15,6 @@ modules:
       - source: system
         destination: /
 
-  # Use inherited negativo17 multimedia repos when present; otherwise install RPM Fusion
-  - type: script
-    scripts:
-      - install-rpmfusion-release.sh
-
   # Seed capture groups used by Wireshark/tcpdump-style package metadata.
   - type: script
     scripts:

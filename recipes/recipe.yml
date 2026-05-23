@@ -18,11 +18,6 @@ modules:
       - source: system
         destination: / # System files and configurations
 
-  # Use inherited negativo17 multimedia repos when present; otherwise install RPM Fusion
-  - type: script
-    scripts:
-      - install-rpmfusion-release.sh
-
   # DNF packages
   - type: dnf
     install:
