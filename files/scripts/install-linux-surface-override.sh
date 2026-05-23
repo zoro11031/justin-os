@@ -6,6 +6,8 @@ REPO_FILE="/etc/yum.repos.d/linux-surface.repo"
 RETRY_COUNT="${SURFACE_RETRY_COUNT:-5}"
 RETRY_DELAY="${SURFACE_RETRY_DELAY:-10}"
 RELEASE_API_URL="https://api.github.com/repos/linux-surface/linux-surface/releases/latest"
+GITHUB_TOKEN="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
+AUTH_SCHEME="Bearer"
 
 install -d -m0755 "$(dirname "${REPO_FILE}")"
 if ! curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" --connect-timeout 10 --max-time 60 -fLsS \
@@ -27,7 +29,13 @@ if [[ -z "${OS_VERSION}" ]]; then
   exit 1
 fi
 
-if ! RELEASE_JSON="$(curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" --connect-timeout 10 --max-time 60 -fLsS "${RELEASE_API_URL}")"; then
+AUTH_HEADER=()
+if [[ -n "${GITHUB_TOKEN}" ]]; then
+  AUTH_HEADER=(-H "Authorization: ${AUTH_SCHEME} ${GITHUB_TOKEN}")
+fi
+
+if ! RELEASE_JSON="$(curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" --connect-timeout 10 --max-time 60 -fLsS \
+  "${AUTH_HEADER[@]}" "${RELEASE_API_URL}")"; then
   echo "Failed to fetch linux-surface release metadata from ${RELEASE_API_URL}" >&2
   exit 1
 fi
@@ -35,7 +43,7 @@ KERNEL_URL="$(
   printf '%s' "${RELEASE_JSON}" \
     | grep -Eo '"browser_download_url":\s*"[^"]+"' \
     | cut -d'"' -f4 \
-    | grep -E "kernel-[0-9][^/]*\\.surface\\.fc${OS_VERSION}\\.x86_64\\.rpm" \
+    | grep -E "kernel-[0-9]+[^/]*\\.surface\\.fc${OS_VERSION}\\.x86_64\\.rpm" \
     | head -n1
 )"
 
