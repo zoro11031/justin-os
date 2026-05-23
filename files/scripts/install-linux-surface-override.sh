@@ -8,8 +8,11 @@ RETRY_DELAY="${SURFACE_RETRY_DELAY:-10}"
 RELEASE_API_URL="https://api.github.com/repos/linux-surface/linux-surface/releases/latest"
 
 install -d -m0755 "$(dirname "${REPO_FILE}")"
-curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" --connect-timeout 10 --max-time 60 -fLsS \
-  -o "${REPO_FILE}" "${REPO_URL}"
+if ! curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" --connect-timeout 10 --max-time 60 -fLsS \
+  -o "${REPO_FILE}" "${REPO_URL}"; then
+  echo "Failed to download linux-surface repo file from ${REPO_URL}" >&2
+  exit 1
+fi
 
 OS_VERSION="${OS_VERSION:-}"
 if [[ -z "${OS_VERSION}" ]]; then
@@ -24,7 +27,10 @@ if [[ -z "${OS_VERSION}" ]]; then
   exit 1
 fi
 
-RELEASE_JSON="$(curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" --connect-timeout 10 --max-time 60 -fLsS "${RELEASE_API_URL}")"
+if ! RELEASE_JSON="$(curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" --connect-timeout 10 --max-time 60 -fLsS "${RELEASE_API_URL}")"; then
+  echo "Failed to fetch linux-surface release metadata from ${RELEASE_API_URL}" >&2
+  exit 1
+fi
 KERNEL_URL="$(
   printf '%s' "${RELEASE_JSON}" \
     | grep -Eo '"browser_download_url":\s*"[^"]+"' \
@@ -45,8 +51,11 @@ cleanup() {
 trap cleanup EXIT
 
 KERNEL_FILENAME="${KERNEL_URL##*/}"
-curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" --connect-timeout 10 --max-time 300 -fL \
-  -o "${TMP_DIR}/${KERNEL_FILENAME}" "${KERNEL_URL}"
+if ! curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" --connect-timeout 10 --max-time 300 -fL \
+  -o "${TMP_DIR}/${KERNEL_FILENAME}" "${KERNEL_URL}"; then
+  echo "Failed to download linux-surface dummy kernel RPM from ${KERNEL_URL}" >&2
+  exit 1
+fi
 
 pushd "${TMP_DIR}" >/dev/null
 rpm-ostree override replace "./${KERNEL_FILENAME}" \

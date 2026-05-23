@@ -39,7 +39,9 @@ jobs:
         with:
           recipe: ${{ matrix.recipe }}
           push: "false"
+          # Action requires a key input; keep empty on PRs to avoid signing with unavailable secrets.
           cosign_private_key: ""
+          # Avoid registry auth on PRs to prevent 401s when package write isn't granted.
           registry_token: ""
           pr_event_number: ${{ github.event.number }}
           retry_push_count: 5
