@@ -50,6 +50,7 @@ if command -v jq >/dev/null 2>&1; then
       | head -n1
   )"
 else
+  # Fallback for minimal images without jq available.
   KERNEL_URL="$(
     printf '%s' "${RELEASE_JSON}" \
       | grep -Eo '"browser_download_url":\s*"[^"]+"' \
@@ -88,20 +89,17 @@ if ! rpm-ostree override replace "./${KERNEL_FILENAME}" \
   --install iptsd \
   --install libwacom-surface \
   --install libwacom-surface-data; then
-  status=$?
-  echo "Failed to apply linux-surface kernel override via rpm-ostree (exit ${status})" >&2
-  exit "${status}"
+  echo "Failed to apply linux-surface kernel override via rpm-ostree" >&2
+  exit 1
 fi
 popd >/dev/null
 
 if ! rpm-ostree install kernel-surface-default-watchdog thermald; then
-  status=$?
-  echo "Failed to install linux-surface companion packages (exit ${status})" >&2
-  exit "${status}"
+  echo "Failed to install linux-surface companion packages" >&2
+  exit 1
 fi
 
 if ! rpm-ostree install surface-secureboot; then
-  status=$?
-  echo "Failed to install surface-secureboot (exit ${status})" >&2
-  exit "${status}"
+  echo "Failed to install surface-secureboot" >&2
+  exit 1
 fi
