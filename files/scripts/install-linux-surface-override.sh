@@ -29,15 +29,18 @@ if [[ -z "${OS_VERSION}" ]]; then
   exit 1
 fi
 
-AUTH_HEADER=()
 if [[ -n "${GITHUB_TOKEN}" ]]; then
-  AUTH_HEADER=(-H "Authorization: ${AUTH_SCHEME} ${GITHUB_TOKEN}")
-fi
-
-if ! RELEASE_JSON="$(curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" --connect-timeout 10 --max-time 60 -fLsS \
-  "${AUTH_HEADER[@]}" "${RELEASE_API_URL}")"; then
-  echo "Failed to fetch linux-surface release metadata from ${RELEASE_API_URL}" >&2
-  exit 1
+  if ! RELEASE_JSON="$(curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" --connect-timeout 10 --max-time 60 -fLsS \
+    -H "Authorization: ${AUTH_SCHEME} ${GITHUB_TOKEN}" "${RELEASE_API_URL}")"; then
+    echo "Failed to fetch linux-surface release metadata from ${RELEASE_API_URL}" >&2
+    exit 1
+  fi
+else
+  if ! RELEASE_JSON="$(curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" --connect-timeout 10 --max-time 60 -fLsS \
+    "${RELEASE_API_URL}")"; then
+    echo "Failed to fetch linux-surface release metadata from ${RELEASE_API_URL}" >&2
+    exit 1
+  fi
 fi
 KERNEL_URL="$(
   printf '%s' "${RELEASE_JSON}" \
