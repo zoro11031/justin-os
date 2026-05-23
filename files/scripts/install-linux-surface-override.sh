@@ -69,7 +69,7 @@ if ! curl --retry "${RETRY_COUNT}" --retry-delay "${RETRY_DELAY}" --connect-time
 fi
 
 pushd "${TMP_DIR}" >/dev/null
-rpm-ostree override replace "./${KERNEL_FILENAME}" \
+if ! rpm-ostree override replace "./${KERNEL_FILENAME}" \
   --remove kernel-core \
   --remove kernel-modules \
   --remove kernel-modules-extra \
@@ -78,8 +78,18 @@ rpm-ostree override replace "./${KERNEL_FILENAME}" \
   --install kernel-surface \
   --install iptsd \
   --install libwacom-surface \
-  --install libwacom-surface-data
+  --install libwacom-surface-data; then
+  echo "Failed to apply linux-surface kernel override via rpm-ostree" >&2
+  exit 1
+fi
 popd >/dev/null
 
-rpm-ostree install kernel-surface-default-watchdog thermald
-rpm-ostree install surface-secureboot
+if ! rpm-ostree install kernel-surface-default-watchdog thermald; then
+  echo "Failed to install linux-surface companion packages" >&2
+  exit 1
+fi
+
+if ! rpm-ostree install surface-secureboot; then
+  echo "Failed to install surface-secureboot" >&2
+  exit 1
+fi
