@@ -37,6 +37,7 @@ Fedora Atomic images tuned for daily development, built on Universal Blue with a
 Systemd services handle Flatpaks after each new deployment:
 
 - `flatpak-auto-update.timer` → runs weekly to update both user and system scopes; exits quietly if offline.
+- CI builds also retry Flathub availability checks and skip validation on transient network failures to avoid flaky builds.
 
 If Flatpaks aren't installed when you first boot, you can force install all the default Flatpaks found in the common-flatpaks.yml file using the following command:
 
