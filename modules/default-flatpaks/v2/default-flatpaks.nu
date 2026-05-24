@@ -94,11 +94,12 @@ def retry [
   operation: closure # The closure to retry
 ]: nothing -> any {
     mut delay = $sleep_duration
-    for $c in $count..0 {
+    for attempt in 0..$count {
         try {
             return (do $operation)
         } catch {|err|
-            if ($c == 0) {
+            let remaining = $count - $attempt
+            if ($remaining == 0) {
                 return (error make {
                     msg: $"Failed to run closure:\n($err.msg)"
                     label: {
@@ -108,7 +109,7 @@ def retry [
                 })
             }
 
-            print $"Retrying closure in (ansi green)($delay)(ansi reset) (ansi cyan)($c)(ansi reset) more time\(s\)"
+            print $"Retrying closure in (ansi green)($delay)(ansi reset) (ansi cyan)($remaining)(ansi reset) more time\(s\)"
             sleep $delay
             $delay = $delay * $backoff
         }
