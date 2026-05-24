@@ -88,7 +88,7 @@ def main [configStr: string] {
 }
 
 def retry [
-  --sleep-duration(-d): duration = 2sec # The duration to sleep until another retry
+  --sleep_duration(-d): duration = 2sec # The duration to sleep until another retry
   --count(-c): int = 6 # How many retries should be done
   --backoff(-b): int = 2 # Backoff multiplier for each retry
   operation: closure # The closure to retry
@@ -131,7 +131,7 @@ def checkFlathub [packages: list<string>] {
     let results = $packages | each { |package|
         let id = $package | split row "/" | get 0
         try {
-            let _ = retry -c 6 -d 2sec { http get --max-time 10sec $"https://flathub.org/api/v2/stats/($id)" }
+            let _ = retry { http get --max-time 10sec $"https://flathub.org/api/v2/stats/($id)" }
             { package: $package, status: "ok" }
         } catch {|err|
             let msg = $err.msg | default ""
