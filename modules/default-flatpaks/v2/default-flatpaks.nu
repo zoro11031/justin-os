@@ -94,11 +94,11 @@ def retry [
   operation: closure # The closure to retry
 ]: nothing -> any {
     mut delay = $sleep_duration
-    for attempt in 0..$count {
+    mut remaining = $count
+    loop {
         try {
             return (do $operation)
         } catch {|err|
-            let remaining = $count - $attempt
             if ($remaining == 0) {
                 return (error make {
                     msg: $"Failed to run closure:\n($err.msg)"
@@ -112,6 +112,7 @@ def retry [
             print $"Retrying closure in (ansi green)($delay)(ansi reset) (ansi cyan)($remaining)(ansi reset) more time\(s\)"
             sleep $delay
             $delay = $delay * $backoff
+            $remaining = $remaining - 1
         }
     }
 }
@@ -131,7 +132,7 @@ def checkFlathub [packages: list<string>] {
     let results = $packages | each { |package|
         let id = $package | split row "/" | get 0
         try {
-            let _ = retry { http get --max-time 10sec $"https://flathub.org/api/v2/stats/($id)" }
+            retry { http get --max-time 10sec $"https://flathub.org/api/v2/stats/($id)" }
             { package: $package, status: "ok" }
         } catch {|err|
             let msg = $err.msg | default ""
