@@ -1,46 +1,45 @@
 modules:
-  - type: default-flatpaks
-    configurations:
-      - notify: true
-        scope: system
-        install:
-          # Browsers (touch-friendly)
-          - com.brave.Browser
-          - com.google.Chrome
+  - type: default-flatpaks@v1
+    notify: true
+    system:
+      install:
+        # Browsers (touch-friendly)
+        - com.brave.Browser
+        - com.google.Chrome
 
-          # GNOME Core Apps
-          - org.gnome.Calculator
-          - org.gnome.Calendar
-          - org.gnome.Cheese
-          - org.gnome.Contacts
-          - org.gnome.Evince
-          - org.gnome.Loupe
-          - org.gnome.Maps
-          - org.gnome.TextEditor
-          - org.gnome.Weather
-          - org.gnome.clocks
-          - org.gnome.Snapshot
+        # GNOME Core Apps
+        - org.gnome.Calculator
+        - org.gnome.Calendar
+        - org.gnome.Cheese
+        - org.gnome.Contacts
+        - org.gnome.Evince
+        - org.gnome.Loupe
+        - org.gnome.Maps
+        - org.gnome.TextEditor
+        - org.gnome.Weather
+        - org.gnome.clocks
+        - org.gnome.Snapshot
 
-          # Productivity
-          - com.bitwarden.desktop
-          - net.cozic.joplin_desktop
-          - net.ankiweb.Anki
-          - com.nextcloud.desktopclient.nextcloud
+        # Productivity
+        - com.bitwarden.desktop
+        - net.cozic.joplin_desktop
+        - net.ankiweb.Anki
+        - com.nextcloud.desktopclient.nextcloud
 
-          # Communication
-          - com.discordapp.Discord
+        # Communication
+        - com.discordapp.Discord
 
-          # Media (touch-friendly players)
-          - com.github.iwalton3.jellyfin-media-player
-          - com.plexamp.Plexamp
-          - tv.plex.PlexDesktop
+        # Media (touch-friendly players)
+        - com.github.iwalton3.jellyfin-media-player
+        - com.plexamp.Plexamp
+        - tv.plex.PlexDesktop
 
-          # Drawing/Notes (stylus support)
-          - com.github.xournalpp.xournalpp
-          - org.kde.krita
+        # Drawing/Notes (stylus support)
+        - com.github.xournalpp.xournalpp
+        - org.kde.krita
 
-          # Office
-          - org.libreoffice.LibreOffice
+        # Office
+        - org.libreoffice.LibreOffice
 
-          # Utilities
-          - com.github.tchx84.Flatseal
+        # Utilities
+        - com.github.tchx84.Flatseal
