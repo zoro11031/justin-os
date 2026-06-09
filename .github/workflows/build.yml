@@ -61,5 +61,5 @@ jobs:
           maximize_build_space: true
 
       - name: Fail if both attempts fail
-        if: steps.build_attempt_1.outcome == 'failure' && steps.build_attempt_2.outcome == 'failure'
+        if: steps.build_attempt_1.outcome == 'failure' && steps.build_attempt_2.outcome != 'success'
         run: exit 1
